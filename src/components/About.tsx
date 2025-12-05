@@ -31,7 +31,7 @@ export const About = () => {
   ];
 
   return (
-    <section ref={ref} className="py-24 px-4 relative">
+    <section ref={ref} className="py-16 md:py-24 px-4 relative">
       <div className="max-w-6xl mx-auto">
         <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8">
