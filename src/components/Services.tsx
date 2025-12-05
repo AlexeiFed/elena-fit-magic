@@ -49,7 +49,7 @@ export const Services = () => {
   ];
 
   return (
-    <section id="services" className="py-24 px-4 relative">
+    <section id="services" className="py-16 md:py-24 px-4 relative">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
