@@ -17,12 +17,12 @@ export const CTA = () => {
             </div>
           </div>
 
-          <h2 className="text-5xl md:text-7xl font-bold">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">
             Готовы изменить <br />
             <span className="gradient-text">свою жизнь?</span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Напишите мне, чтобы узнать детали и начать путь к себе обновленной
           </p>
 

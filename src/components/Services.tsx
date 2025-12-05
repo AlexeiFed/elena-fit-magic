@@ -52,7 +52,7 @@ export const Services = () => {
     <section id="services" className="py-24 px-4 relative">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Форматы <span className="gradient-text">сопровождения</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
