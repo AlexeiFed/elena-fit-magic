@@ -31,9 +31,9 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
   }, []);
 
   // Calculate stacking position based on index
+  // Each subsequent card goes OVER the previous one
   const translateY = index * 20;
-  const scale = 1 - (index * 0.02);
-  const zIndex = totalCards - index;
+  const zIndex = index + 1;
 
   return (
     <div
@@ -49,16 +49,11 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
         animationDelay: `${index * 150}ms`,
       }}
     >
-      <div
-        className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02]"
-        style={{
-          transform: `scale(${scale})`,
-        }}
-      >
+      <div className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02]">
         {/* Glow effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
         
-        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-sm transition-all duration-300">
+        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-sm transition-all duration-300 min-h-[380px] sm:min-h-[420px] md:min-h-[450px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 pr-16">
