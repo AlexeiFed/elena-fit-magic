@@ -1,5 +1,7 @@
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ServiceDetailModal, serviceDetails } from "./ServiceDetailModal";
 
 interface ServiceCardProps {
   title: string;
@@ -11,7 +13,10 @@ interface ServiceCardProps {
 
 export const ServiceCard = ({ title, subtitle, features, index, totalCards }: ServiceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  
+  const detailData = serviceDetails[title] || null;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -78,12 +83,30 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
             ))}
           </ul>
 
+          {/* Details button */}
+          <div className="mt-6 pt-4 border-t border-border/30">
+            <Button
+              variant="ghost"
+              className="w-full justify-between text-primary hover:text-primary hover:bg-primary/10 group/btn"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <span>Подробнее</span>
+              <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+            </Button>
+          </div>
+
           {/* Card number indicator */}
           <div className="absolute top-6 right-6 sm:top-8 sm:right-8 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg sm:text-xl">
             {index + 1}
           </div>
         </div>
       </div>
+      
+      <ServiceDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        data={detailData}
+      />
     </div>
   );
 };
