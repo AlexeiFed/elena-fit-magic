@@ -92,7 +92,7 @@ All colors MUST be HSL.
   }
 
   .animate-glow-pulse {
-    animation: glowPulse 3s ease-in-out infinite;
+    animation: glowPulse 5s ease-in-out infinite;
   }
 
   @keyframes fadeInUp {
