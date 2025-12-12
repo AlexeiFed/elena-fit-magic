@@ -17,7 +17,7 @@ const AnimatedStat = ({ value, suffix, label }: { value: number; suffix: string;
 
 export const CTA = () => {
   return (
-    <section className="py-16 md:py-24 px-4 relative overflow-hidden">
+    <section className="py-20 md:py-28 px-4 relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-[150px] animate-glow" />
@@ -31,7 +31,7 @@ export const CTA = () => {
             </div>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight md:leading-snug">
             Готовы изменить <br />
             <span className="gradient-text">свою жизнь?</span>
           </h2>
