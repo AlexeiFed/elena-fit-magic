@@ -229,71 +229,76 @@ export const WhyChoose = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full flex flex-wrap justify-center gap-2 h-auto bg-transparent mb-8">
+          {/* Sticky tabs */}
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4">
+            <TabsList className="w-full flex flex-wrap justify-center gap-2 h-auto bg-transparent">
+              {packages.map((pkg) => (
+                <TabsTrigger
+                  key={pkg.id}
+                  value={pkg.id}
+                  className="px-4 py-3 text-sm md:text-base font-medium rounded-full border border-border/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-all duration-300 hover:border-primary/50"
+                >
+                  {pkg.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+
+          <div className="mt-8">
             {packages.map((pkg) => (
-              <TabsTrigger
-                key={pkg.id}
-                value={pkg.id}
-                className="px-4 py-3 text-sm md:text-base font-medium rounded-full border border-border/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-all duration-300 hover:border-primary/50"
-              >
-                {pkg.title}
-              </TabsTrigger>
+              <TabsContent key={pkg.id} value={pkg.id} className="animate-fade-in">
+                <div className="space-y-8">
+                  {/* Why Choose Section */}
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                      </span>
+                      Почему выбирают «{pkg.title}»?
+                    </h3>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {pkg.whyChoose.map((item, index) => (
+                        <div
+                          key={index}
+                          className="group p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                            <span className="text-primary">{item.icon}</span>
+                          </div>
+                          <h4 className="font-semibold text-lg mb-2">{item.title}</h4>
+                          <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Why It Works Section */}
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-accent" />
+                      </span>
+                      Почему это работает?
+                    </h3>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {pkg.whyWorks.map((item, index) => (
+                        <div
+                          key={index}
+                          className="group p-5 rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-border/50 hover:border-accent/30 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center mb-3 group-hover:bg-accent/20 transition-colors">
+                            <span className="text-accent">{item.icon}</span>
+                          </div>
+                          <h4 className="font-semibold mb-2">{item.title}</h4>
+                          <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
             ))}
-          </TabsList>
-
-          {packages.map((pkg) => (
-            <TabsContent key={pkg.id} value={pkg.id} className="animate-fade-in">
-              <div className="space-y-8">
-                {/* Why Choose Section */}
-                <div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-primary" />
-                    </span>
-                    Почему выбирают «{pkg.title}»?
-                  </h3>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {pkg.whyChoose.map((item, index) => (
-                      <div
-                        key={index}
-                        className="group p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                          <span className="text-primary">{item.icon}</span>
-                        </div>
-                        <h4 className="font-semibold text-lg mb-2">{item.title}</h4>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Why It Works Section */}
-                <div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-accent" />
-                    </span>
-                    Почему это работает?
-                  </h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {pkg.whyWorks.map((item, index) => (
-                      <div
-                        key={index}
-                        className="group p-5 rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-border/50 hover:border-accent/30 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5"
-                      >
-                        <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center mb-3 group-hover:bg-accent/20 transition-colors">
-                          <span className="text-accent">{item.icon}</span>
-                        </div>
-                        <h4 className="font-semibold mb-2">{item.title}</h4>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          ))}
+          </div>
         </Tabs>
       </div>
     </section>
