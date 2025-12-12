@@ -38,7 +38,7 @@ export const Hero = () => {
           <Button
             onClick={scrollToServices}
             size="lg"
-            className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 animate-glow"
+            className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 animate-glow-pulse"
           >
             Выбрать программу
             <ArrowDown className="ml-2 group-hover:translate-y-1 transition-transform" />
