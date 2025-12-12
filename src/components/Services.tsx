@@ -73,10 +73,15 @@ export const Services = () => {
   return (
     <section id="services" className="py-20 md:py-28 px-4 relative">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight md:leading-snug">
+        {/* Sticky header */}
+        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm py-6 -mx-4 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center leading-tight md:leading-snug">
             Форматы <span className="gradient-text">сопровождения</span>
           </h2>
+        </div>
+        
+        {/* Non-sticky subtitle */}
+        <div className="text-center mb-16 mt-4">
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Выберите формат, который подходит именно вам
           </p>
