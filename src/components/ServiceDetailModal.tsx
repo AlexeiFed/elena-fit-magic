@@ -143,7 +143,7 @@ export const serviceDetails: Record<string, ServiceDetailData> = {
       },
     ],
     pricing: {
-      label: "Инвестиция:",
+      label: "Стоимость:",
       options: [
         "1 месяц - 15 000",
         "3 месяца – 35 000 (экономия 10 000) — рассрочка на 2 платежа в течение первого месяца",
@@ -202,7 +202,7 @@ export const serviceDetails: Record<string, ServiceDetailData> = {
       },
     ],
     pricing: {
-      label: "Инвестиция:",
+      label: "Стоимость:",
       options: [
         "1 месяц - 15 000",
         "3 месяца – 35 000 (экономия 10 000) — рассрочка на 2 платежа в течение первого месяца",
@@ -261,7 +261,7 @@ export const serviceDetails: Record<string, ServiceDetailData> = {
       },
     ],
     pricing: {
-      label: "Инвестиция:",
+      label: "Стоимость:",
       options: [
         "1 месяц - 20 000",
         "3 месяца – 50 000 (экономия 10 000) — рассрочка на 2 платежа в течение первого месяца",
@@ -319,7 +319,7 @@ export const serviceDetails: Record<string, ServiceDetailData> = {
       },
     ],
     pricing: {
-      label: "Инвестиция:",
+      label: "Стоимость:",
       options: ["3 месяца – 25 000 (рассрочка на 2 платежа в течение первого месяца)"],
     },
   },
