@@ -217,13 +217,13 @@ export const WhyChoose = () => {
   const [activeTab, setActiveTab] = useState("mini-group");
 
   return (
-    <section className="py-16 md:py-24 px-4 relative">
+    <section className="py-20 md:py-28 px-4 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight md:leading-snug">
             Что делает наши <span className="gradient-text">программы эффективными</span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Узнайте подробнее о каждом формате сопровождения
           </p>
         </div>

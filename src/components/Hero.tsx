@@ -28,7 +28,7 @@ export const Hero = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         <div className="animate-fade-in">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-bold mb-6 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-bold mb-6 tracking-tight leading-tight md:leading-snug">
             Персональный фитнес <br />
             <span className="gradient-text">с Еленой Пильщаковой</span>
           </h1>
