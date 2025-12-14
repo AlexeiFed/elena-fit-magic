@@ -1,9 +1,10 @@
-import { Heart, Sparkles, Target, Zap } from "lucide-react";
+import { Heart, Sparkles, Target, Zap, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import elenaAbout from "@/assets/elena-about.jpg";
 
 export const About = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -24,11 +25,31 @@ export const About = () => {
   }, []);
 
   const features = [
-    { icon: Heart, text: "Здоровье" },
-    { icon: Zap, text: "Энергия" },
-    { icon: Sparkles, text: "Питание" },
-    { icon: Target, text: "Цели" },
+    { 
+      icon: Heart, 
+      text: "Здоровье",
+      description: "Комплексный подход к вашему здоровью: анализ показателей, работа с врачами и создание устойчивых привычек для долгосрочного результата."
+    },
+    { 
+      icon: Zap, 
+      text: "Энергия",
+      description: "Восстановление энергетического баланса через правильное питание, режим сна и физическую активность для максимальной продуктивности."
+    },
+    { 
+      icon: Sparkles, 
+      text: "Питание",
+      description: "Индивидуальный план питания на основе ваших целей, предпочтений и особенностей организма — без жёстких диет и ограничений."
+    },
+    { 
+      icon: Target, 
+      text: "Цели",
+      description: "Постановка реалистичных целей и пошаговая стратегия их достижения с регулярным отслеживанием прогресса и корректировкой плана."
+    },
   ];
+
+  const toggleCard = (text: string) => {
+    setExpandedCard(expandedCard === text ? null : text);
+  };
 
   return (
     <section ref={ref} className="py-20 md:py-28 px-4 relative">
@@ -71,9 +92,18 @@ export const About = () => {
                     className="relative group"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className="p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-glow">
-                      <feature.icon className="w-8 h-8 text-primary mb-3" />
+                    <div 
+                      onClick={() => toggleCard(feature.text)}
+                      className={`p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-glow cursor-pointer ${expandedCard === feature.text ? 'border-primary/50 shadow-glow' : ''}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <feature.icon className="w-8 h-8 text-primary" />
+                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCard === feature.text ? 'rotate-180' : ''}`} />
+                      </div>
                       <p className="text-foreground font-medium">{feature.text}</p>
+                      <div className={`overflow-hidden transition-all duration-300 ${expandedCard === feature.text ? 'max-h-40 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                      </div>
                     </div>
                   </div>
                 ))}

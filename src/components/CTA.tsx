@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Send } from "lucide-react";
+import { Send } from "lucide-react";
+import maxLogo from "@/assets/max-logo.png";
 import { useCountUp } from "@/hooks/useCountUp";
 
 const AnimatedStat = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
@@ -59,7 +60,7 @@ export const CTA = () => {
               asChild
             >
               <a href="https://max.me/yourusername" target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="mr-2 group-hover:scale-110 transition-transform" />
+                <img src={maxLogo} alt="Max" className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
                 Написать в Max
               </a>
             </Button>

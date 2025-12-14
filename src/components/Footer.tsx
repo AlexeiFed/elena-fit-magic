@@ -1,4 +1,5 @@
-import { MessageCircle, Send } from "lucide-react";
+import { Send } from "lucide-react";
+import maxLogo from "@/assets/max-logo.png";
 
 export const Footer = () => {
   return (
@@ -29,7 +30,7 @@ export const Footer = () => {
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-card border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary/10"
             >
-              <MessageCircle className="w-5 h-5 text-primary" />
+              <img src={maxLogo} alt="Max" className="w-6 h-6" />
             </a>
           </div>
         </div>
