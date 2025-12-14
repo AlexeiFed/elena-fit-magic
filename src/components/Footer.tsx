@@ -1,4 +1,4 @@
-import { Instagram, Send } from "lucide-react";
+import { MessageCircle, Send } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -24,12 +24,12 @@ export const Footer = () => {
               <Send className="w-5 h-5 text-primary" />
             </a>
             <a
-              href="https://instagram.com/yourusername"
+              href="https://max.me/yourusername"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-card border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary/10"
             >
-              <Instagram className="w-5 h-5 text-primary" />
+              <MessageCircle className="w-5 h-5 text-primary" />
             </a>
           </div>
         </div>

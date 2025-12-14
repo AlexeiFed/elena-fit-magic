@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Instagram, Send } from "lucide-react";
+import { MessageCircle, Send } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 
 const AnimatedStat = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
@@ -33,7 +33,7 @@ export const CTA = () => {
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight md:leading-snug">
             Готовы изменить <br />
-            <span className="gradient-text">свою жизнь?</span>
+            <span className="gradient-text">свой образ жизни?</span>
           </h2>
 
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -58,9 +58,9 @@ export const CTA = () => {
               className="group border-2 border-primary/50 hover:border-primary hover:bg-primary/10 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 min-w-[200px] sm:min-w-[240px]"
               asChild
             >
-              <a href="https://instagram.com/yourusername" target="_blank" rel="noopener noreferrer">
-                <Instagram className="mr-2 group-hover:rotate-12 transition-transform" />
-                Написать в Instagram
+              <a href="https://max.me/yourusername" target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="mr-2 group-hover:scale-110 transition-transform" />
+                Написать в Max
               </a>
             </Button>
           </div>
