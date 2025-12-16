@@ -14,6 +14,7 @@ interface ServiceCardProps {
 export const ServiceCard = ({ title, subtitle, features, index, totalCards }: ServiceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
   
   const detailData = serviceDetails[title] || null;
@@ -25,7 +26,7 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
           setIsVisible(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     );
 
     if (ref.current) {
@@ -35,56 +36,71 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
     return () => observer.disconnect();
   }, []);
 
-  // Calculate stacking position based on index
-  // Each subsequent card goes OVER the previous one
-  const translateY = index * 20;
-  const zIndex = index + 1;
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const rotateX = (e.clientY - centerY) / 20;
+    const rotateY = (centerX - e.clientX) / 20;
+    setRotation({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setRotation({ x: 0, y: 0 });
+  };
 
   return (
     <div
       ref={ref}
       className={`
-        sticky transition-all duration-700 
-        ${isVisible ? "opacity-100" : "opacity-0 translate-y-20"}
+        transition-all duration-700 
+        ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}
       `}
       style={{
-        top: `${100 + translateY}px`,
-        zIndex: zIndex,
-        transformOrigin: "top center",
-        animationDelay: `${index * 150}ms`,
+        animationDelay: `${index * 100}ms`,
+        perspective: "1000px",
       }}
     >
-      <div className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02]">
+      <div 
+        className="group relative rounded-3xl overflow-hidden transition-all duration-300 hover:scale-105"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transformStyle: "preserve-3d",
+          transition: rotation.x === 0 && rotation.y === 0 ? "transform 0.5s ease-out" : "transform 0.1s ease-out",
+        }}
+      >
         {/* Glow effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
         
-        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-sm transition-all duration-300 min-h-[520px] sm:min-h-[420px] md:min-h-[450px]">
+        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 h-full min-h-[420px] flex flex-col">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
-          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 pr-16">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 pr-12">
             {title}
           </h3>
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg mb-6 md:mb-8">{subtitle}</p>
+          <p className="text-muted-foreground text-sm md:text-base mb-4">{subtitle}</p>
           
-          <ul className="space-y-3 md:space-y-4">
+          <ul className="space-y-2 flex-grow">
             {features.map((feature, idx) => (
               <li
                 key={idx}
-                className="flex items-start gap-3 group/item"
-                style={{ animationDelay: `${idx * 50}ms` }}
+                className="flex items-start gap-2 group/item"
               >
                 <div className="mt-0.5 flex-shrink-0">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:bg-primary/20 transition-colors duration-300">
-                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:bg-primary/20 transition-colors duration-300">
+                    <Check className="w-3 h-3 text-primary" />
                   </div>
                 </div>
-                <span className="text-sm sm:text-base text-foreground/90 leading-relaxed">{feature}</span>
+                <span className="text-sm text-foreground/90 leading-relaxed">{feature}</span>
               </li>
             ))}
           </ul>
 
           {/* Details button */}
-          <div className="mt-6 pt-4 border-t border-border/30">
+          <div className="mt-4 pt-4 border-t border-border/30">
             <Button
               variant="ghost"
               className="w-full justify-between text-primary hover:text-primary hover:bg-primary/10 group/btn"
@@ -96,7 +112,7 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
           </div>
 
           {/* Card number indicator */}
-          <div className="absolute top-6 right-6 sm:top-8 sm:right-8 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg sm:text-xl">
+          <div className="absolute top-6 right-6 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm sm:text-base">
             {index + 1}
           </div>
         </div>

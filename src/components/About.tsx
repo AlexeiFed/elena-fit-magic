@@ -1,10 +1,16 @@
-import { Heart, Sparkles, Target, Zap, ChevronDown } from "lucide-react";
+import { Heart, Sparkles, Target, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import elenaAbout from "@/assets/elena-about.jpg";
 
+interface TooltipPosition {
+  x: number;
+  y: number;
+}
+
 export const About = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ x: 0, y: 0 });
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -47,8 +53,24 @@ export const About = () => {
     },
   ];
 
-  const toggleCard = (text: string) => {
-    setExpandedCard(expandedCard === text ? null : text);
+  const handleCardInteraction = (text: string, event: React.MouseEvent | React.TouchEvent) => {
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    
+    // Random offset for position variety
+    const randomOffsetX = (Math.random() - 0.5) * 40;
+    const randomOffsetY = (Math.random() - 0.5) * 20;
+    
+    // Position tooltip near the card with random offset
+    const x = rect.width / 2 + randomOffsetX;
+    const y = -10 + randomOffsetY;
+    
+    setTooltipPosition({ x, y });
+    setActiveTooltip(activeTooltip === text ? null : text);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveTooltip(null);
   };
 
   return (
@@ -89,22 +111,37 @@ export const About = () => {
                 {features.map((feature, index) => (
                   <div
                     key={feature.text}
-                    className="relative group"
+                    className="relative"
                     style={{ animationDelay: `${index * 100}ms` }}
+                    onMouseLeave={handleMouseLeave}
                   >
                     <div 
-                      onClick={() => toggleCard(feature.text)}
-                      className={`p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-glow cursor-pointer ${expandedCard === feature.text ? 'border-primary/50 shadow-glow' : ''}`}
+                      onMouseEnter={(e) => handleCardInteraction(feature.text, e)}
+                      onClick={(e) => handleCardInteraction(feature.text, e)}
+                      className="p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-glow cursor-pointer"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <feature.icon className="w-8 h-8 text-primary" />
-                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCard === feature.text ? 'rotate-180' : ''}`} />
                       </div>
                       <p className="text-foreground font-medium">{feature.text}</p>
-                      <div className={`overflow-hidden transition-all duration-300 ${expandedCard === feature.text ? 'max-h-40 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                      </div>
                     </div>
+                    
+                    {/* Floating tooltip */}
+                    {activeTooltip === feature.text && (
+                      <div 
+                        className="absolute z-50 w-64 p-4 rounded-xl bg-card/95 backdrop-blur-md border border-primary/30 shadow-2xl animate-fade-in"
+                        style={{
+                          left: `${tooltipPosition.x}px`,
+                          bottom: `calc(100% + ${tooltipPosition.y}px)`,
+                          transform: 'translateX(-50%)',
+                        }}
+                      >
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-card/95 border-r border-b border-primary/30 rotate-45" />
+                        <p className="text-sm text-foreground/90 leading-relaxed relative z-10">
+                          {feature.description}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
