@@ -1,7 +1,8 @@
 import { Check, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ServiceDetailModal, serviceDetails } from "./ServiceDetailModal";
+import { ServiceDetailModal } from "./ServiceDetailModal";
+import { serviceDetails } from "./serviceDetails";
 
 interface ServiceCardProps {
   title: string;
@@ -50,26 +51,34 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
     setRotation({ x: 0, y: 0 });
   };
 
+  // Calculate staggered delay based on card position
+  const row = Math.floor(index / 3);
+  const col = index % 3;
+  const delay = (row * 100) + (col * 100);
+  
   return (
     <div
       ref={ref}
-      className={`
-        transition-all duration-700 
-        ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}
-      `}
+      className="relative"
       style={{
-        animationDelay: `${index * 100}ms`,
         perspective: "1000px",
+        animation: isVisible 
+          ? `fadeInUp 0.6s ease-out ${delay}ms both`
+          : 'none',
       }}
     >
       <div 
-        className="group relative rounded-3xl overflow-hidden transition-all duration-300 hover:scale-105"
+        className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02]"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
-          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateZ(0)`,
           transformStyle: "preserve-3d",
-          transition: rotation.x === 0 && rotation.y === 0 ? "transform 0.5s ease-out" : "transform 0.1s ease-out",
+          transition: rotation.x === 0 && rotation.y === 0 
+            ? "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)" 
+            : "transform 0.1s ease-out",
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
         }}
       >
         {/* Glow effect on hover */}

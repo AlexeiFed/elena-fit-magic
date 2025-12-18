@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  Target, 
-  Calendar, 
-  Zap, 
-  BookOpen, 
-  Shield, 
-  Heart, 
-  Brain, 
-  TrendingUp, 
+import {
+  Users,
+  Target,
+  Calendar,
+  Zap,
+  BookOpen,
+  Shield,
+  Heart,
+  Brain,
+  TrendingUp,
   CheckCircle2,
   Sparkles,
   Clock,
@@ -258,6 +258,32 @@ const packages: PackageInfo[] = [
 
 export const WhyChoose = () => {
   const [activeTab, setActiveTab] = useState("premium");
+  const headingRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
+  const userChangedTabRef = useRef(false);
+
+  const handleTabChange = (value: string) => {
+    userChangedTabRef.current = true;
+    setActiveTab(value);
+
+    // Scroll to heading with delay to ensure DOM is updated
+    setTimeout(() => {
+      const heading = headingRefs.current[value];
+      if (heading) {
+        const isMobile = window.innerWidth < 768;
+        const offset = isMobile ? 220 : 140; // Larger offset for mobile
+        const elementPosition = heading.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: "smooth"
+        });
+      }
+    }, 50);
+  };
+
+  useEffect(() => {
+    if (!userChangedTabRef.current) return;
+    userChangedTabRef.current = false;
+  }, [activeTab]);
 
   return (
     <section className="py-20 md:py-28 px-4 relative">
@@ -271,7 +297,7 @@ export const WhyChoose = () => {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Sticky tabs */}
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4">
             <TabsList className="w-full flex flex-wrap justify-center gap-2 h-auto bg-transparent">
@@ -289,11 +315,20 @@ export const WhyChoose = () => {
 
           <div className="mt-8">
             {packages.map((pkg) => (
-              <TabsContent key={pkg.id} value={pkg.id} className="animate-fade-in">
+              <TabsContent
+                key={pkg.id}
+                value={pkg.id}
+                className="animate-fade-in transition-all duration-500 ease-out data-[state=active]:opacity-100 data-[state=active]:translate-y-0 data-[state=inactive]:opacity-0 data-[state=inactive]:translate-y-4"
+              >
                 <div className="space-y-8">
                   {/* Why Choose Section */}
                   <div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
+                    <h3
+                      ref={(el) => {
+                        headingRefs.current[pkg.id] = el;
+                      }}
+                      className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3 scroll-mt-40"
+                    >
                       <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                         <Sparkles className="w-5 h-5 text-primary" />
                       </span>
