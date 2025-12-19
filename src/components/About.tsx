@@ -76,6 +76,9 @@ export const About = () => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 leading-tight md:leading-snug">
             Меня зовут <span className="gradient-text">Елена Пильщакова</span>
           </h2>
+          <p className="text-xl md:text-2xl text-muted-foreground text-center mb-6">
+            Фитнес тренер международного уровня, нутрициолог, наставник
+          </p>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mt-16">
             {/* Image */}
@@ -119,6 +122,8 @@ export const About = () => {
                       }}
                       onMouseEnter={(e) => handleCardInteraction(feature.text, index, e)}
                       onMouseLeave={handleMouseLeave}
+                      onTouchStart={(e) => handleCardInteraction(feature.text, index, e as any)}
+                      onTouchEnd={handleMouseLeave}
                     >
                       <div className="flex items-center gap-2 md:gap-4 min-w-0">
                         <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors duration-300">
@@ -157,6 +162,22 @@ export const About = () => {
         </div>,
         document.body
       )}
+
+  // Hide tooltip on scroll/touchmove for mobile devices
+  useEffect(() => {
+    if (!activeTooltip) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (!isMobile) return;
+
+    const hide = () => setActiveTooltip(null);
+    window.addEventListener('scroll', hide, { passive: true });
+    window.addEventListener('touchmove', hide, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', hide);
+      window.removeEventListener('touchmove', hide as any);
+    };
+  }, [activeTooltip]);
     </section>
   );
 };

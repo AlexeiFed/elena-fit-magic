@@ -9,7 +9,7 @@ const AnimatedStat = ({ value, suffix, label }: { value: number; suffix: string;
   return (
     <div ref={ref} className="text-center">
       <div className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-2">
-        {count}{suffix}
+        {'>'}{count}{suffix}
       </div>
       <div className="text-xs sm:text-sm text-muted-foreground">{label}</div>
     </div>
@@ -69,7 +69,7 @@ export const CTA = () => {
           {/* Trust indicators */}
           <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 md:pt-16 max-w-2xl mx-auto">
             <AnimatedStat value={300} suffix="+" label="Довольных клиентов" />
-            <AnimatedStat value={5} suffix=" лет" label="Опыта в фитнесе" />
+            <AnimatedStat value={11} suffix=" лет" label="Опыта в фитнесе" />
             <AnimatedStat value={98} suffix="%" label="Успешных результатов" />
           </div>
         </div>

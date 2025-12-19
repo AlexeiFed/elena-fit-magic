@@ -59,7 +59,7 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
   return (
     <div
       ref={ref}
-      className="relative"
+      className="relative h-full"
       style={{
         perspective: "1000px",
         animation: isVisible 
