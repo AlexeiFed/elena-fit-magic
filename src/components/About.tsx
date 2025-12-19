@@ -69,6 +69,22 @@ export const About = () => {
     setActiveTooltip(null);
   };
 
+  // Hide tooltip on scroll/touchmove for mobile devices
+  useEffect(() => {
+    if (!activeTooltip) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (!isMobile) return;
+
+    const hide = () => setActiveTooltip(null);
+    window.addEventListener('scroll', hide, { passive: true });
+    window.addEventListener('touchmove', hide, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', hide);
+      window.removeEventListener('touchmove', hide as any);
+    };
+  }, [activeTooltip]);
+
   return (
     <section ref={ref} className="py-20 md:py-28 px-4 relative">
       <div className="max-w-6xl mx-auto">
@@ -162,22 +178,6 @@ export const About = () => {
         </div>,
         document.body
       )}
-
-  // Hide tooltip on scroll/touchmove for mobile devices
-  useEffect(() => {
-    if (!activeTooltip) return;
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    if (!isMobile) return;
-
-    const hide = () => setActiveTooltip(null);
-    window.addEventListener('scroll', hide, { passive: true });
-    window.addEventListener('touchmove', hide, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', hide);
-      window.removeEventListener('touchmove', hide as any);
-    };
-  }, [activeTooltip]);
     </section>
   );
 };
