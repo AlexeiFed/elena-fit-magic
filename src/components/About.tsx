@@ -122,6 +122,26 @@ export const About = () => {
                 Моя миссия — помочь вам изменить отношение к телу, питанию и себе, чтобы результат стал частью вашей жизни.
               </p>
 
+              <div className="my-6 flex justify-center">
+                <div className="bg-card border border-border/50 rounded-2xl p-4 max-w-xl w-full text-sm md:text-base">
+                  <h4 className="text-lg font-semibold mb-3 text-center text-primary">Регалии</h4>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
+                      <span>
+                        Чемпионка Дальнего Востока по бодибилдингу в категории эстетический фитнес 2014г. (Гран-при Амур)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
+                      <span>
+                        Бронзовая призерка Приморского края Российской Федерации 2024г.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4 pt-4">
                 {features.map((feature, index) => {
                   const isLeftSide = index % 2 === 0;
