@@ -41,16 +41,16 @@ const NotFound = () => {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="gap-2"
             onClick={() => navigate("/")}
           >
             <Home className="w-5 h-5" />
             На главную
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="lg"
             className="gap-2"
             onClick={() => window.history.back()}

@@ -1,40 +1,69 @@
-:root{
-  --gradient-anim: linear-gradient(90deg,#ff7a7a,#ffb86b,#ffd36b,#8be78b,#7ac6ff);
+:root {
+  --gradient-anim: linear-gradient(90deg, #ff7a7a, #ffb86b, #ffd36b, #8be78b, #7ac6ff);
 }
 
 /* Gradient button used across site */
-.gradient-button{
-  background: linear-gradient(90deg,rgba(255,122,122,0.12),rgba(255,184,107,0.12));
-  border: 1px solid rgba(255,122,122,0.12);
+.gradient-button {
+  background: linear-gradient(90deg, rgba(255, 122, 122, 0.12), rgba(255, 184, 107, 0.12));
+  border: 1px solid rgba(255, 122, 122, 0.12);
   transition: all .25s ease;
 }
-.gradient-button:hover{
-  background: linear-gradient(90deg,#ff7a7a,#ffb86b,#ffd36b);
-  box-shadow: 0 8px 24px rgba(255,122,122,0.12), 0 2px 8px rgba(0,0,0,0.06);
+
+.gradient-button:hover {
+  background: linear-gradient(90deg, #ff7a7a, #ffb86b, #ffd36b);
+  box-shadow: 0 8px 24px rgba(255, 122, 122, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   color: white;
   transform: translateY(-2px);
 }
 
 /* Modal animation */
 @keyframes modalFadeIn {
-  from{opacity:0; transform: translateY(8px) scale(.98)}
-  to{opacity:1; transform: translateY(0) scale(1)}
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1)
+  }
 }
-.modalFadeIn{
-  animation: modalFadeIn .32s cubic-bezier(.2,.9,.2,1);
+
+.modalFadeIn {
+  animation: modalFadeIn .32s cubic-bezier(.2, .9, .2, 1);
 }
 
 /* Minimal typography scale: site-text-sm, site-text-md, site-text-lg */
-.site-text-sm{font-size:0.8125rem;line-height:1.3}
-.site-text-md{font-size:0.9375rem;line-height:1.45}
-.site-text-lg{font-size:1.0625rem;line-height:1.5}
+.site-text-sm {
+  font-size: 0.8125rem;
+  line-height: 1.3
+}
+
+.site-text-md {
+  font-size: 0.9375rem;
+  line-height: 1.45
+}
+
+.site-text-lg {
+  font-size: 1.0625rem;
+  line-height: 1.5
+}
 
 /* About image wrapper to control size on desktop */
-.about-image-wrap{max-width:420px}
+.about-image-wrap {
+  max-width: 420px
+}
 
-@keyframes fadeInUp{
-  from{opacity:0; transform: translateY(8px)}
-  to{opacity:1; transform: translateY(0)}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
 }
 
 @tailwind base;
@@ -46,6 +75,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -57,6 +87,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -68,6 +99,7 @@
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -103,6 +135,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -212,6 +245,7 @@ All colors MUST be HSL.
       opacity: 0;
       transform: translateY(40px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -219,18 +253,24 @@ All colors MUST be HSL.
   }
 
   @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateY(0px);
     }
+
     50% {
       transform: translateY(-20px);
     }
   }
 
   @keyframes glowPulse {
-    0%, 100% {
+
+    0%,
+    100% {
       box-shadow: 0 0 20px hsl(25 100% 50% / 0.15);
     }
+
     50% {
       box-shadow: 0 0 40px hsl(25 100% 50% / 0.3);
     }
@@ -239,15 +279,20 @@ All colors MUST be HSL.
 
 /* Site-wide typographic scale: only 3 sizes */
 .site-text-lg {
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
   line-height: 1.6;
 }
+
 .site-text-md {
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
+  /* 16px */
   line-height: 1.6;
 }
+
 .site-text-sm {
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.875rem;
+  /* 14px */
   line-height: 1.5;
 }
 
@@ -288,9 +333,11 @@ All colors MUST be HSL.
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -302,6 +349,7 @@ All colors MUST be HSL.
     opacity: 0;
     transform: scale(0.95) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -322,6 +370,7 @@ div[class*="DialogOverlay"] {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

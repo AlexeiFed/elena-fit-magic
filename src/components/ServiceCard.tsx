@@ -140,7 +140,7 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
         onClose={() => setIsModalOpen(false)}
         data={detailData}
       />
-      
+
       <RegistrationModal
         isOpen={isRegistrationOpen}
         onClose={() => setIsRegistrationOpen(false)}

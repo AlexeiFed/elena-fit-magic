@@ -38,8 +38,8 @@ export const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Елена Пильщакова. Все права защищены.</p>
-          <Link 
-            to="/privacy" 
+          <Link
+            to="/privacy"
             className="hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
           >
             Политика конфиденциальности
