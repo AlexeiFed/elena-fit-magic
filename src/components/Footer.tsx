@@ -9,7 +9,7 @@ export const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold gradient-text mb-2">
-              Елена Пильщакова
+              Елена Пильщикова
             </h3>
             <p className="text-sm text-muted-foreground">
               Персональный фитнес-тренер
@@ -37,7 +37,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Елена Пильщакова. Все права защищены.</p>
+          <p>© {new Date().getFullYear()} Елена Пильщикова. Все права защищены.</p>
           <Link
             to="/privacy"
             className="hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"

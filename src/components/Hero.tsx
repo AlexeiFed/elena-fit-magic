@@ -11,9 +11,9 @@ export const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background image with overlay */}
       <div className="absolute inset-0">
-        <img 
-          src={elenaHero} 
-          alt="Елена Пильщакова - персональный фитнес тренер" 
+        <img
+          src={elenaHero}
+          alt="Елена Пильщикова - персональный фитнес тренер"
           className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
@@ -30,7 +30,7 @@ export const Hero = () => {
         <div className="animate-fade-in">
           <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-bold mb-6 tracking-tight leading-tight md:leading-snug">
             Персональный фитнес <br />
-            <span className="gradient-text">с Еленой Пильщаковой</span>
+            <span className="gradient-text">с Еленой Пильщиковой</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
             Комплексное сопровождение для трансформации тела, здоровья и мышления

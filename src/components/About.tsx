@@ -90,7 +90,7 @@ export const About = () => {
       <div className="max-w-7xl mx-auto">
         <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 leading-tight md:leading-snug">
-            Меня зовут <span className="gradient-text">Елена Пильщакова</span>
+            Меня зовут <span className="gradient-text">Елена Пильщикова</span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground text-center mb-6">
             Фитнес тренер международного уровня, нутрициолог, наставник
@@ -102,7 +102,7 @@ export const About = () => {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl h-auto md:h-[1020px]">
                 <img
                   src={elenaAbout}
-                  alt="Елена Пильщакова - чемпион по фитнес-бикини"
+                  alt="Елена Пильщикова - чемпион по фитнес-бикини"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
