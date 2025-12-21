@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 export interface RegistrationModalProps {
     isOpen: boolean;
@@ -427,15 +428,9 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                         {/* Privacy Policy Text */}
                         <p className="text-xs text-muted-foreground text-center">
                             Нажимая на кнопку, вы соглашаетесь с{" "}
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    window.open('/privacy', '_blank');
-                                }}
-                                className="text-primary hover:underline bg-transparent border-none cursor-pointer p-0"
-                            >
+                            <Link to="/privacy" className="text-primary hover:underline">
                                 политикой конфиденциальности
-                            </button>
+                            </Link>
                         </p>
                     </form>
                 )}
