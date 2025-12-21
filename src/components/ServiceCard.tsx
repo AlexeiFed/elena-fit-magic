@@ -2,6 +2,7 @@ import { Check, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ServiceDetailModal } from "./ServiceDetailModal";
+import { RegistrationModal } from "./RegistrationModal";
 import { serviceDetails } from "./serviceDetails";
 
 interface ServiceCardProps {
@@ -15,9 +16,10 @@ interface ServiceCardProps {
 export const ServiceCard = ({ title, subtitle, features, index, totalCards }: ServiceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
-  
+
   const detailData = serviceDetails[title] || null;
 
   useEffect(() => {
@@ -55,27 +57,27 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
   const row = Math.floor(index / 3);
   const col = index % 3;
   const delay = (row * 100) + (col * 100);
-  
+
   return (
     <div
       ref={ref}
       className="relative h-full"
       style={{
         perspective: "1000px",
-        animation: isVisible 
+        animation: isVisible
           ? `fadeInUp 0.6s ease-out ${delay}ms both`
           : 'none',
       }}
     >
-      <div 
-        className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+      <div
+        className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] h-full"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateZ(0)`,
           transformStyle: "preserve-3d",
-          transition: rotation.x === 0 && rotation.y === 0 
-            ? "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)" 
+          transition: rotation.x === 0 && rotation.y === 0
+            ? "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
             : "transform 0.1s ease-out",
           willChange: 'transform',
           backfaceVisibility: 'hidden',
@@ -83,15 +85,15 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
       >
         {/* Glow effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-        
-        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 h-full min-h-[420px] flex flex-col">
+
+        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 h-full flex flex-col">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
+
           <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 pr-12">
             {title}
           </h3>
           <p className="text-muted-foreground text-sm md:text-base mb-4">{subtitle}</p>
-          
+
           <ul className="space-y-2 flex-grow">
             {features.map((feature, idx) => (
               <li
@@ -108,11 +110,17 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
             ))}
           </ul>
 
-          {/* Details button */}
-          <div className="mt-4 pt-4 border-t border-border/30">
+          {/* Details and registration buttons */}
+          <div className="mt-4 pt-4 border-t border-border/30 flex gap-2">
+            <Button
+              className="flex-1 gradient-button"
+              onClick={() => setIsRegistrationOpen(true)}
+            >
+              Выбрать
+            </Button>
             <Button
               variant="ghost"
-              className="w-full justify-between text-primary hover:text-primary hover:bg-primary/10 group/btn"
+              className="flex-1 justify-between text-primary hover:text-primary hover:bg-primary/10 group/btn"
               onClick={() => setIsModalOpen(true)}
             >
               <span>Подробнее</span>
@@ -126,11 +134,17 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
           </div>
         </div>
       </div>
-      
+
       <ServiceDetailModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         data={detailData}
+      />
+      
+      <RegistrationModal
+        isOpen={isRegistrationOpen}
+        onClose={() => setIsRegistrationOpen(false)}
+        serviceName={title}
       />
     </div>
   );

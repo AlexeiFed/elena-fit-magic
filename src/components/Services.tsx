@@ -10,7 +10,6 @@ export const Services = () => {
         "Разбор анализов крови от доктора",
         "Индивидуальный план питания",
         "Программа тренировок под ваши цели",
-        "Подключение психолога/гастроэнтеролога (со 2-го месяца)",
         "Ежедневная обратная связь",
         "Гарантия результата",
       ],
@@ -85,7 +84,9 @@ export const Services = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{
+          gridAutoRows: '1fr'
+        }}>
           {services.map((service, index) => (
             <ServiceCard
               key={service.title}

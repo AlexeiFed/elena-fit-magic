@@ -287,7 +287,7 @@ export const WhyChoose = () => {
 
   return (
     <section className="py-20 md:py-28 px-4 relative">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight md:leading-snug">
             Что делает наши <span className="gradient-text">программы эффективными</span>
@@ -356,7 +356,7 @@ export const WhyChoose = () => {
                       <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
                         <Zap className="w-5 h-5 text-accent" />
                       </span>
-                      Почему это работает?
+                      Почему это работает
                     </h3>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       {pkg.whyWorks.map((item, index) => (

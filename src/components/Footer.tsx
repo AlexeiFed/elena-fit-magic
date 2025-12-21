@@ -1,10 +1,11 @@
 import { Send } from "lucide-react";
 import maxLogo from "@/assets/max-logo.png";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
     <footer className="py-12 px-4 border-t border-border/50">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold gradient-text mb-2">
@@ -17,7 +18,7 @@ export const Footer = () => {
 
           <div className="flex gap-4">
             <a
-              href="https://t.me/yourusername"
+              href="https://t.me/Elena_fittrainer"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-card border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary/10"
@@ -25,7 +26,7 @@ export const Footer = () => {
               <Send className="w-5 h-5 text-primary" />
             </a>
             <a
-              href="https://max.me/yourusername"
+              href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-card border border-border/50 hover:border-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary/10"
@@ -35,8 +36,14 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-border/30 text-center text-sm text-muted-foreground">
+        <div className="mt-8 pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Елена Пильщакова. Все права защищены.</p>
+          <Link 
+            to="/privacy" 
+            className="hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            Политика конфиденциальности
+          </Link>
         </div>
       </div>
     </footer>

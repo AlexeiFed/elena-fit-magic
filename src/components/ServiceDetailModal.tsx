@@ -27,14 +27,14 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
           </DialogTitle>
           <p className="text-muted-foreground">{data.subtitle}</p>
         </DialogHeader>
-        
+
         <ScrollArea className="max-h-[60vh] px-6 py-4">
           {data.description && (
             <p className="text-foreground/80 italic mb-6 text-sm leading-relaxed">
               {data.description}
             </p>
           )}
-          
+
           <div className="space-y-6">
             {data.sections.map((section, idx) => (
               <div key={idx} className="space-y-3">
@@ -53,7 +53,7 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
               </div>
             ))}
           </div>
-          
+
           <div className="mt-8 pt-6 border-t border-border/30">
             <h4 className="font-semibold text-foreground mb-3">{data.pricing.label}</h4>
             <ul className="space-y-2">
@@ -65,7 +65,7 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
               ))}
             </ul>
           </div>
-          
+
           {data.extras && data.extras.length > 0 && (
             <div className="mt-6 pt-4 border-t border-border/30">
               <h4 className="font-semibold text-foreground mb-3">Дополнительные услуги:</h4>

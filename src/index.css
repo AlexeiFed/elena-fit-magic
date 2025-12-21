@@ -1,3 +1,42 @@
+:root{
+  --gradient-anim: linear-gradient(90deg,#ff7a7a,#ffb86b,#ffd36b,#8be78b,#7ac6ff);
+}
+
+/* Gradient button used across site */
+.gradient-button{
+  background: linear-gradient(90deg,rgba(255,122,122,0.12),rgba(255,184,107,0.12));
+  border: 1px solid rgba(255,122,122,0.12);
+  transition: all .25s ease;
+}
+.gradient-button:hover{
+  background: linear-gradient(90deg,#ff7a7a,#ffb86b,#ffd36b);
+  box-shadow: 0 8px 24px rgba(255,122,122,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Modal animation */
+@keyframes modalFadeIn {
+  from{opacity:0; transform: translateY(8px) scale(.98)}
+  to{opacity:1; transform: translateY(0) scale(1)}
+}
+.modalFadeIn{
+  animation: modalFadeIn .32s cubic-bezier(.2,.9,.2,1);
+}
+
+/* Minimal typography scale: site-text-sm, site-text-md, site-text-lg */
+.site-text-sm{font-size:0.8125rem;line-height:1.3}
+.site-text-md{font-size:0.9375rem;line-height:1.45}
+.site-text-lg{font-size:1.0625rem;line-height:1.5}
+
+/* About image wrapper to control size on desktop */
+.about-image-wrap{max-width:420px}
+
+@keyframes fadeInUp{
+  from{opacity:0; transform: translateY(8px)}
+  to{opacity:1; transform: translateY(0)}
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -195,5 +234,95 @@ All colors MUST be HSL.
     50% {
       box-shadow: 0 0 40px hsl(25 100% 50% / 0.3);
     }
+  }
+}
+
+/* Site-wide typographic scale: only 3 sizes */
+.site-text-lg {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
+}
+.site-text-md {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+}
+.site-text-sm {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+}
+
+/* Utility to constrain hero/about image on desktop */
+.about-image-wrap {
+  max-width: 420px;
+  width: 100%;
+}
+
+
+/* Gradient button styles */
+.gradient-button {
+  background: linear-gradient(135deg, hsl(25 100% 50%), hsl(25 95% 45%)) !important;
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+  border: none !important;
+  color: hsl(0 0% 100%) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.gradient-button:hover {
+  background: hsl(25 100% 50%) !important;
+  box-shadow: 0 0 40px hsl(25 100% 50% / 0.5) !important;
+  transform: scale(1.02);
+}
+
+.gradient-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gradient-button:active {
+  transform: scale(0.98);
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Modal animation */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Dialog content animation */
+div[class*="DialogContent"] {
+  animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Dialog overlay animation */
+div[class*="DialogOverlay"] {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

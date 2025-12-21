@@ -24,7 +24,7 @@ export const CTA = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-[150px] animate-glow" />
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center space-y-6 md:space-y-8">
           <div className="inline-block animate-float">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 md:mb-6 flex items-center justify-center">
@@ -47,7 +47,7 @@ export const CTA = () => {
               className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 min-w-[200px] sm:min-w-[240px]"
               asChild
             >
-              <a href="https://t.me/yourusername" target="_blank" rel="noopener noreferrer">
+              <a href="https://t.me/Elena_fittrainer" target="_blank" rel="noopener noreferrer">
                 <Send className="mr-2 group-hover:translate-x-1 transition-transform" />
                 Написать в Telegram
               </a>
@@ -59,7 +59,7 @@ export const CTA = () => {
               className="group border-2 border-primary/50 hover:border-primary hover:bg-primary/10 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 min-w-[200px] sm:min-w-[240px]"
               asChild
             >
-              <a href="https://max.me/yourusername" target="_blank" rel="noopener noreferrer">
+              <a href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE" target="_blank" rel="noopener noreferrer">
                 <img src={maxLogo} alt="Max" className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
                 Написать в Max
               </a>

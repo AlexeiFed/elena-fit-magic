@@ -87,7 +87,7 @@ export const About = () => {
 
   return (
     <section ref={ref} className="py-20 md:py-28 px-4 relative">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 leading-tight md:leading-snug">
             Меня зовут <span className="gradient-text">Елена Пильщакова</span>
@@ -96,14 +96,14 @@ export const About = () => {
             Фитнес тренер международного уровня, нутрициолог, наставник
           </p>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center mt-16">
+          <div className="grid md:grid-cols-2 gap-12 items-stretch mt-16">
             {/* Image */}
             <div className="relative order-2 md:order-1">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl h-auto md:h-[1020px]">
                 <img
                   src={elenaAbout}
                   alt="Елена Пильщакова - чемпион по фитнес-бикини"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
               </div>
@@ -111,8 +111,8 @@ export const About = () => {
               <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-3xl -z-10 opacity-50" />
               {/* Regalia - mobile (shown under photo) */}
               <div className="mt-6 block md:hidden">
-                <div className="bg-card border border-border/50 rounded-2xl p-4 w-full text-sm">
-                  <h4 className="text-base font-semibold mb-2 text-center text-primary">Регалии</h4>
+                <div className="bg-card border border-border/50 rounded-2xl p-4 w-full text-lg">
+                  <h4 className="text-base font-semibold mb-2 text-left text-lg">Регалии</h4>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-3">
                       <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
@@ -127,38 +127,41 @@ export const About = () => {
               </div>
             </div>
 
-            <div className="space-y-6 order-1 md:order-2">
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Я — ваш персональный проводник в мире здоровья и фитнеса. Выстраиваю стратегию не просто под тело, а под ваш образ жизни, цели и состояние здоровья.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                В своей работе я опираюсь не только на личную экспертизу, но и на команду специалистов, с которыми мы сопровождаем вас комплексно и безопасно — от питания и тренировок до вашего желаемого результата, восстановления и самочувствия.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Моя миссия — помочь вам изменить отношение к телу, питанию и себе, чтобы результат стал частью вашей жизни.
-              </p>
+            <div className="flex flex-col justify-center h-full order-1 md:order-2">
+              <div className="space-y-8 md:space-y-10">
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Я — ваш персональный проводник в мире здоровья и фитнеса. Выстраиваю стратегию не просто под тело, а под ваш образ жизни, цели и состояние здоровья.
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  В своей работе я опираюсь не только на личную экспертизу, но и на команду специалистов, с которыми мы сопровождаем вас комплексно и безопасно — от питания и тренировок до вашего желаемого результата, восстановления и самочувствия.
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Моя миссия — помочь вам изменить отношение к телу, питанию и себе, чтобы результат стал частью вашей жизни.
+                </p>
 
-              <div className="my-6 flex justify-center hidden md:flex">
-                <div className="bg-card border border-border/50 rounded-2xl p-4 max-w-xl w-full text-sm md:text-base">
-                  <h4 className="text-lg font-semibold mb-3 text-center text-primary">Регалии</h4>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-3">
-                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                      <span>
-                        Чемпионка Дальнего Востока по бодибилдингу в категории эстетический фитнес 2014 г. (Гран-при Амур)
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                      <span>
-                        Бронзовая призерка Приморского края Российской Федерации по бодибилдингу в категории эстетический фитнес в 2024 г.
-                      </span>
-                    </li>
-                  </ul>
+                <div className="flex hidden md:flex w-full">
+                  <div className="bg-card border border-border/50 rounded-2xl p-4 w-full text-sm md:text-lg">
+                    <h4 className="text-lg font-semibold mb-3 text-left text-primary">Регалии</h4>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-3">
+                        <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
+                        <span>
+                          Чемпионка Дальнего Востока по бодибилдингу в категории эстетический фитнес 2014 г. (Гран-при Амур)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
+                        <span>
+                          Бронзовая призерка Приморского края Российской Федерации по бодибилдингу в категории эстетический фитнес в 2024 г.
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
+
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4">
+              <div className="grid grid-cols-2 gap-4 pt-8 md:pt-10">
                 {features.map((feature, index) => {
                   const isLeftSide = index % 2 === 0;
                   const animationClass = isLeftSide ? 'animate-slide-in-left' : 'animate-slide-in-right';
