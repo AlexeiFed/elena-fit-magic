@@ -1,0 +1,15 @@
+# Запрет прямого доступа к JSON-файлам данных через браузер.
+# Данные должны читаться только через PHP-скрипт admin-data.php.
+# Это предотвращает прямой доступ к /api/data/*.json по URL.
+
+# Запретить доступ ко всем файлам в этой директории
+Deny from all
+
+# Разрешить доступ только из PHP (через include/require на сервере)
+<FilesMatch "\.json$">
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.htaccess$">
+    Deny from all
+</FilesMatch>

@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { useI18n } from "@/hooks/useI18n";
 
 export interface RegistrationModalProps {
     isOpen: boolean;
@@ -37,6 +37,7 @@ export const RegistrationModal = ({
     onClose,
     serviceName,
 }: RegistrationModalProps) => {
+    const { t } = useI18n();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<FormData>({
@@ -51,6 +52,8 @@ export const RegistrationModal = ({
     });
     const [errors, setErrors] = useState<Partial<FormData>>({});
     const [isSuccess, setIsSuccess] = useState(false);
+    // SEC-012: Honeypot-поле для защиты от ботов (скрытое, человек не заполнит)
+    const [honeypot, setHoneypot] = useState("");
 
     // Reset form when modal opens/closes
     useEffect(() => {
@@ -74,19 +77,21 @@ export const RegistrationModal = ({
         const newErrors: Partial<FormData> = {};
 
         if (!formData.name.trim()) {
-            newErrors.name = "Введите ваше имя";
+            newErrors.name = t("registration.nameError");
         }
 
         if (!formData.phone.trim()) {
-            newErrors.phone = "Введите номер телефона";
+            newErrors.phone = t("registration.phoneError");
+        } else if (!/^\+?[\d\s\-()]{7,18}$/.test(formData.phone.trim())) {
+            newErrors.phone = t("registration.phoneFormatError");
         }
 
         // Check if at least one contact method is selected
         const hasContactMethod = formData.whatsapp || formData.telegram || formData.max;
         if (!hasContactMethod) {
             toast({
-                title: "Ошибка",
-                description: "Выберите хотя бы один способ связи",
+                title: t("registration.error"),
+                description: t("registration.errorContact"),
                 variant: "destructive",
             });
             return false;
@@ -94,12 +99,12 @@ export const RegistrationModal = ({
 
         // Validate Telegram nickname if selected
         if (formData.telegram && !formData.telegramNickname.trim()) {
-            newErrors.telegramNickname = "Введите ваш Telegram";
+            newErrors.telegramNickname = t("registration.telegramError");
         }
 
         // Validate Max link if selected
         if (formData.max && !formData.maxLink.trim()) {
-            newErrors.maxLink = "Введите ссылку на ваш аккаунт Max";
+            newErrors.maxLink = t("registration.maxError");
         }
 
         setErrors(newErrors);
@@ -110,6 +115,23 @@ export const RegistrationModal = ({
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
+
+        // Real-time валидация телефона: только цифры, +, пробелы, дефисы, скобки
+        if (name === "phone") {
+            const hasLetters = /[a-zA-Zа-яА-ЯёЁ]/.test(value);
+            if (hasLetters) {
+                setErrors((prev) => ({
+                    ...prev,
+                    phone: t("registration.phoneFormatError"),
+                }));
+                return;
+            }
+            // Очищаем ошибку если ввод корректный
+            if (errors.phone) {
+                setErrors((prev) => ({ ...prev, phone: undefined }));
+            }
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -128,6 +150,15 @@ export const RegistrationModal = ({
             ...prev,
             [name]: checked,
         }));
+        // Очищаем ошибки связанных полей при снятии чекбокса
+        if (!checked) {
+            if (name === "telegram") {
+                setErrors((prev) => ({ ...prev, telegramNickname: undefined }));
+            }
+            if (name === "max") {
+                setErrors((prev) => ({ ...prev, maxLink: undefined }));
+            }
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -140,37 +171,32 @@ export const RegistrationModal = ({
         setIsLoading(true);
 
         try {
-            // Prepare contact methods info
-            const contactMethods = [];
-            if (formData.whatsapp) contactMethods.push("WhatsApp");
-            if (formData.telegram) contactMethods.push(`Telegram: @${formData.telegramNickname}`);
-            if (formData.max) contactMethods.push(`Max: ${formData.maxLink}`);
+            // Подготовка структурированных данных для сервера (SEC-013: сервер сам собирает сообщение)
+            const contactMethods: { type: string; value?: string }[] = [];
+            if (formData.whatsapp) contactMethods.push({ type: "whatsapp" });
+            if (formData.telegram) contactMethods.push({ type: "telegram", value: formData.telegramNickname });
+            if (formData.max) contactMethods.push({ type: "max", value: formData.maxLink });
 
-            // Prepare the message for Telegram
-            const telegramMessage = `
-🏋️ <b>Новая запись к тренеру</b>
+            const payload = {
+                name: formData.name,
+                phone: formData.phone,
+                message: formData.message,
+                service: serviceName || "",
+                contactMethods,
+                // SEC-012: Honeypot — если заполнено, сервер отклонит запрос
+                website: honeypot,
+            };
 
-<b>Формат:</b> ${serviceName || "Не указан"}
+            // In development (localhost), use demo mode
+            const isDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-<b>Имя:</b> ${formData.name}
-<b>Телефон:</b> ${formData.phone}
-<b>Способ связи:</b> ${contactMethods.join(", ")}
-${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
-      `.trim();
-
-            // Get bot token from environment
-            const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-            const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-
-            if (!botToken || !chatId) {
-                // If no Telegram config, just show success (for development)
-                console.warn("Telegram credentials not configured. Using demo mode.");
-                console.log("Form data:", formData);
+            if (isDev) {
+                console.warn("Development mode: form data not sent to Telegram.");
+                console.log("Form payload:", payload);
                 setIsSuccess(true);
                 toast({
-                    title: "Запрос отправлен! 🎉",
-                    description:
-                        "Спасибо за интерес к моим услугам. Я свяжусь с вами в ближайшее время.",
+                    title: t("registration.success") + " 🎉",
+                    description: t("registration.successMessage"),
                 });
                 setTimeout(() => {
                     onClose();
@@ -178,31 +204,23 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                 return;
             }
 
-            // Send message to Telegram
-            const response = await fetch(
-                `https://api.telegram.org/bot${botToken}/sendMessage`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: telegramMessage,
-                        parse_mode: "HTML",
-                    }),
-                }
-            );
+            // Отправка структурированных данных — сервер сам формирует сообщение и санитизирует ввод
+            const response = await fetch("/api/send-telegram.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
             if (!response.ok) {
-                throw new Error("Failed to send message to Telegram");
+                throw new Error("Failed to send message");
             }
 
             setIsSuccess(true);
             toast({
-                title: "Запрос отправлен! 🎉",
-                description:
-                    "Спасибо за интерес к моим услугам. Я свяжусь с вами в ближайшее время.",
+                title: t("registration.success") + " 🎉",
+                description: t("registration.successMessage"),
             });
 
             setTimeout(() => {
@@ -211,9 +229,8 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
         } catch (error) {
             console.error("Error sending form:", error);
             toast({
-                title: "Ошибка",
-                description:
-                    "Не удалось отправить запрос. Пожалуйста, свяжитесь со мной в Телеграм.",
+                title: t("registration.error"),
+                description: t("registration.errorSend"),
                 variant: "destructive",
             });
         } finally {
@@ -225,33 +242,33 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Запись к тренеру</DialogTitle>
-                    <DialogDescription>
-                        {serviceName && (
-                            <p className="text-base text-primary font-medium mt-2">
-                                Формат: <span className="text-foreground">{serviceName}</span>
-                            </p>
-                        )}
-                    </DialogDescription>
+                    <DialogTitle>{t("registration.title")}</DialogTitle>
+                    {serviceName && (
+                        <DialogDescription asChild>
+                            <div className="text-base text-primary font-medium mt-2">
+                                {t("registration.format")} <span className="text-foreground">{t(`serviceFormat.${serviceName}`, {}) || serviceName}</span>
+                            </div>
+                        </DialogDescription>
+                    )}
                 </DialogHeader>
 
                 {isSuccess ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center animate-in fade-in duration-300">
                         <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Спасибо за запрос!</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t("registration.success")}</h3>
                         <p className="text-muted-foreground">
-                            Я свяжусь с вами в ближайшее время
+                            {t("registration.successMessage")}
                         </p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in duration-300">
                         {/* Name Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="name">Имя и фамилия *</Label>
+                            <Label htmlFor="name">{t("registration.name")}</Label>
                             <Input
                                 id="name"
                                 name="name"
-                                placeholder="Ваше имя"
+                                placeholder={t("registration.namePlaceholder")}
                                 value={formData.name}
                                 onChange={handleInputChange}
                                 disabled={isLoading}
@@ -267,13 +284,38 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                             )}
                         </div>
 
+                        {/* SEC-012: Honeypot — скрытое поле-ловушка для ботов */}
+                        <div
+                            aria-hidden="true"
+                            style={{
+                                position: "absolute",
+                                left: "-9999px",
+                                top: "-9999px",
+                                opacity: 0,
+                                height: 0,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <label htmlFor="website">Website</label>
+                            <input
+                                type="text"
+                                id="website"
+                                name="website"
+                                autoComplete="off"
+                                tabIndex={-1}
+                                value={honeypot}
+                                onChange={(e) => setHoneypot(e.target.value)}
+                            />
+                        </div>
+
                         {/* Phone Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="phone">Номер телефона *</Label>
+                            <Label htmlFor="phone">{t("registration.phone")}</Label>
                             <Input
                                 id="phone"
                                 name="phone"
-                                placeholder="+7 (XXX) XXX-XX-XX"
+                                type="tel"
+                                placeholder={t("registration.phonePlaceholder")}
                                 value={formData.phone}
                                 onChange={handleInputChange}
                                 disabled={isLoading}
@@ -291,7 +333,7 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
 
                         {/* Contact Method Selection */}
                         <div className="space-y-3">
-                            <Label>Способ связи *</Label>
+                            <Label>{t("registration.contactMethod")}</Label>
                             <div className="space-y-3">
                                 {/* WhatsApp */}
                                 <div className="flex items-center space-x-3">
@@ -307,7 +349,7 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                                         htmlFor="whatsapp"
                                         className="font-normal cursor-pointer flex-1"
                                     >
-                                        WhatsApp
+                                        {t("registration.whatsapp")}
                                     </Label>
                                 </div>
 
@@ -326,13 +368,13 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                                             htmlFor="telegram"
                                             className="font-normal cursor-pointer flex-1"
                                         >
-                                            Telegram
+                                            {t("registration.telegram")}
                                         </Label>
                                     </div>
                                     {formData.telegram && (
                                         <Input
                                             name="telegramNickname"
-                                            placeholder="Ваш Telegram (без @)"
+                                            placeholder={t("registration.telegramPlaceholder")}
                                             value={formData.telegramNickname}
                                             onChange={handleInputChange}
                                             disabled={isLoading}
@@ -363,13 +405,13 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                                             disabled={isLoading}
                                         />
                                         <Label htmlFor="max" className="font-normal cursor-pointer flex-1">
-                                            Max
+                                            {t("registration.max")}
                                         </Label>
                                     </div>
                                     {formData.max && (
                                         <Input
                                             name="maxLink"
-                                            placeholder="Ссылка на ваш аккаунт Max"
+                                            placeholder={t("registration.maxPlaceholder")}
                                             value={formData.maxLink}
                                             onChange={handleInputChange}
                                             disabled={isLoading}
@@ -392,11 +434,11 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
 
                         {/* Message Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="message">Сообщение</Label>
+                            <Label htmlFor="message">{t("registration.message")}</Label>
                             <Textarea
                                 id="message"
                                 name="message"
-                                placeholder="Ваши вопросы или пожелания..."
+                                placeholder={t("registration.messagePlaceholder")}
                                 value={formData.message}
                                 onChange={handleInputChange}
                                 disabled={isLoading}
@@ -404,7 +446,7 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                                 className="resize-none"
                             />
                             <p className="text-xs text-muted-foreground">
-                                Расскажите о своих целях, ограничениях по здоровью или других важных деталях
+                                {t("registration.messageHint")}
                             </p>
                         </div>
 
@@ -418,19 +460,19 @@ ${formData.message ? `<b>Сообщение:</b> ${formData.message}` : ""}
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Отправка...
+                                    {t("registration.submitting")}
                                 </>
                             ) : (
-                                "Отправить запрос"
+                                t("registration.submit")
                             )}
                         </Button>
 
                         {/* Privacy Policy Text */}
                         <p className="text-xs text-muted-foreground text-center">
-                            Нажимая на кнопку, вы соглашаетесь с{" "}
-                            <Link to="/privacy" className="text-primary hover:underline">
-                                политикой конфиденциальности
-                            </Link>
+                            {t("registration.privacy")}{" "}
+                            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                {t("registration.privacyLink")}
+                            </a>
                         </p>
                     </form>
                 )}

@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useI18n } from "@/hooks/useI18n";
+import { motion, AnimatePresence } from "framer-motion";
+import { TextReveal, Reveal } from "./animations/Reveal";
+import { DESIGN_TOKENS } from "@/lib/design-tokens";
 import {
   Users,
   Target,
@@ -38,239 +42,244 @@ interface PackageInfo {
   }[];
 }
 
-const packages: PackageInfo[] = [
-  {
-    id: "premium",
-    title: "Премиум",
-    whyChoose: [
-      {
-        title: "Максимальная персонализация и глубина",
-        description: "Для тех, кто хочет не просто изменить тело, а комплексно улучшить здоровье, разобравшись во всех нюансах: от гормонов и сна до психологии.",
-        icon: <Sparkles className="w-5 h-5" />
-      },
-      {
-        title: "Индивидуальный подход как стандарт",
-        description: "Твой план питания полностью уникален и пересобирается каждый месяц. Контроль восстановления и консультации профильных специалистов входят в пакет.",
-        icon: <Target className="w-5 h-5" />
-      },
-      {
-        title: "Комфорт и гибкость",
-        description: "Возможность «заморозки» программы на случай болезни снимает стресс и показывает, что мы заботимся о твоём результате в любых обстоятельствах.",
-        icon: <Shield className="w-5 h-5" />
-      }
-    ],
-    whyWorks: [
-      {
-        title: "Глубинная диагностика",
-        description: "Мы работаем не со следствиями, а с причинами. Онлайн-диагностика, разбор анализов и консультации психолога/гастроэнтеролога позволяют выстроить стратегию, которая решает корневые проблемы.",
-        icon: <Microscope className="w-5 h-5" />
-      },
-      {
-        title: "Динамическая адаптация",
-        description: "Ежемесячная полная корректировка плана (а не точечные правки) учитывает все изменения в вашем организме и жизни, обеспечивая непрерывный прогресс без плато.",
-        icon: <RefreshCw className="w-5 h-5" />
-      },
-      {
-        title: "Командный консилиум",
-        description: "Над вашим результатом работает связка «тренер + врач + профильный специалист». Решения принимаются коллегиально, что повышает их точность и эффективность в разы.",
-        icon: <Users className="w-5 h-5" />
-      },
-      {
-        title: "Гарантия как партнерство",
-        description: "Гарантия результата при соблюдении плана — это твоё серьезное обязательство, которое делает тебя не клиентом, а партнером в общем проекте под названием «Ваше здоровье».",
-        icon: <Handshake className="w-5 h-5" />
-      }
-    ]
-  },
-  {
-    id: "basic",
-    title: "Базовый",
-    whyChoose: [
-      {
-        title: "Оптимальный старт",
-        description: "Это самый популярный формат для тех, кто хочет серьезных изменений под руководством эксперта.",
-        icon: <TrendingUp className="w-5 h-5" />
-      },
-      {
-        title: "Полный контроль",
-        description: "Ты получаешь персональные тренировки, структуру питания и ежедневную связь с наставником — всё, что нужно для уверенного движения к цели.",
-        icon: <CheckCircle2 className="w-5 h-5" />
-      },
-      {
-        title: "Выгода на дистанции",
-        description: "Долгосрочные пакеты дают максимальную экономию, мотивируя идти до результата, а не бросать через месяц.",
-        icon: <Sparkles className="w-5 h-5" />
-      }
-    ],
-    whyWorks: [
-      {
-        title: "Персонализация + поддержка",
-        description: "Индивидуальный план тренировок и питания, созданный под твой запрос, корректируется еженедельно. Ты не останешься наедине с программой.",
-        icon: <UserCheck className="w-5 h-5" />
-      },
-      {
-        title: "Фундамент здоровья",
-        description: "Даже в базовом пакете раз в 3 месяца ваши анализы смотрит врач, что гарантирует безопасность и эффективность рекомендаций по БАДам и нагрузкам.",
-        icon: <Heart className="w-5 h-5" />
-      },
-      {
-        title: "Принцип постоянства",
-        description: "Ежедневная обратная связь и еженедельные корректировки не дают «застрять» на плато и формируют устойчивые привычки.",
-        icon: <Clock className="w-5 h-5" />
-      },
-      {
-        title: "Гарантия как обязательство",
-        description: "Наличие гарантии результата — это наша уверенность в методике и твоя дополнительная мотивация следовать плану.",
-        icon: <Award className="w-5 h-5" />
-      }
-    ]
-  },
-  {
-    id: "mini-group",
-    title: "Мини-группа",
-    whyChoose: [
-      {
-        title: "Идеальный баланс цены и внимания",
-        description: "Ты получаешь экспертный контроль и поддержку по стоимости ниже индивидуальных программ, но в группе, где тренер успевает уделить время каждому.",
-        icon: <Target className="w-5 h-5" />
-      },
-      {
-        title: "Мотивация окружения",
-        description: "Поддержка единомышленников не дают свернуть с пути. Ты не один!",
-        icon: <Users className="w-5 h-5" />
-      },
-      {
-        title: "Структура и дисциплина",
-        description: "Четкий график онлайн-встреч, еженедельная отчетность и контроль питания создают необходимый ритм для результата.",
-        icon: <Calendar className="w-5 h-5" />
-      }
-    ],
-    whyWorks: [
-      {
-        title: "Эффект синергии",
-        description: "Групповая динамика увеличивает личную ответственность и вовлеченность каждого участника.",
-        icon: <Zap className="w-5 h-5" />
-      },
-      {
-        title: "Системный подход",
-        description: "Обучение принципам питания дает тебе инструменты на всю жизнь, а не просто готовое меню.",
-        icon: <BookOpen className="w-5 h-5" />
-      },
-      {
-        title: "Фокус на контроле",
-        description: "Проверка каждого приема пищи и техники упражнений исключает главные ошибки новичков, обеспечивая быстрый и безопасный прогресс.",
-        icon: <Shield className="w-5 h-5" />
-      },
-      {
-        title: "Командная экспертиза",
-        description: "Ты получаешь доступ не только к тренеру, но и к групповой сессии с психологом, что позволяет проработать глубинные причины сложных привычек.",
-        icon: <Brain className="w-5 h-5" />
-      }
-    ]
-  },
-  {
-    id: "curator",
-    title: "Сопровождение с куратором",
-    whyChoose: [
-      {
-        title: "Персональный контроль",
-        description: "Ежедневная связь с куратором обеспечивает постоянную поддержку и быстрые корректировки плана.",
-        icon: <UserCheck className="w-5 h-5" />
-      },
-      {
-        title: "Комплексный подход",
-        description: "Индивидуальный план тренировок и питания с регулярной проверкой и корректировкой.",
-        icon: <Target className="w-5 h-5" />
-      },
-      {
-        title: "Контроль восстановления",
-        description: "Мониторинг сна и восстановления для максимальной эффективности тренировок.",
-        icon: <Clock className="w-5 h-5" />
-      }
-    ],
-    whyWorks: [
-      {
-        title: "Ежедневная обратная связь",
-        description: "Постоянный контакт с куратором не дает сбиться с пути и обеспечивает быструю реакцию на изменения.",
-        icon: <Activity className="w-5 h-5" />
-      },
-      {
-        title: "Еженедельный контроль",
-        description: "Проверка питания и отчеты еженедельно помогают отслеживать прогресс и вносить коррективы.",
-        icon: <BarChart3 className="w-5 h-5" />
-      },
-      {
-        title: "Регулярные консультации",
-        description: "Консультации раз в 2 недели позволяют глубоко разобрать все вопросы и адаптировать программу.",
-        icon: <Users className="w-5 h-5" />
-      },
-      {
-        title: "Системность подхода",
-        description: "Комплексный контроль всех аспектов — от тренировок до сна — обеспечивает устойчивый результат.",
-        icon: <CheckCircle2 className="w-5 h-5" />
-      }
-    ]
-  },
-  {
-    id: "nutrition",
-    title: "Нутрициология",
-    whyChoose: [
-      {
-        title: "Наука вместо диет",
-        description: "Для тех, кто устал от ограничений и хочет понять, как именно твоё тело работает с пищей. Ты получаешь не просто список продуктов, а знания и индивидуальный протокол, основанный на анализах.",
-        icon: <Lightbulb className="w-5 h-5" />
-      },
-      {
-        title: "Фокус на здоровье изнутри",
-        description: "Основная цель — не только коррекция веса, но и повышение энергии, улучшение качества сна, кожи, работы ЖКТ и общего самочувствия.",
-        icon: <Heart className="w-5 h-5" />
-      },
-      {
-        title: "Работа с пищевым поведением",
-        description: "В пакете «Трансформация» включена работа с психологом, что помогает убрать «срывы», эмоциональное переедание и выстроить здоровые отношения с едой навсегда.",
-        icon: <Brain className="w-5 h-5" />
-      }
-    ],
-    whyWorks: [
-      {
-        title: "Данные превыше всего",
-        description: "Все рекомендации по питанию, БАДам и образу жизни строятся на объективных данных ваших лабораторных анализов, а не на общих советах.",
-        icon: <BarChart3 className="w-5 h-5" />
-      },
-      {
-        title: "Мультидисциплинарный подход",
-        description: "Команда «нутрициолог + врач + психолог» воздействует на проблему с трех сторон: биохимия, ежедневные привычки и психология.",
-        icon: <Users className="w-5 h-5" />
-      },
-      {
-        title: "Образовательный компонент",
-        description: "Ты не просто выполняете предписания, а учитесь понимать сигналы своего тела, самостоятельно составлять рацион и принимать осознанные решения о питании.",
-        icon: <BookOpen className="w-5 h-5" />
-      },
-      {
-        title: "Поэтапное погружение",
-        description: "Пакет «Старт» дает быстрый результат и понимание процесса, а «Трансформация» закрепляет его на уровне устойчивых нейронных связей и привычек, что является ключом к долгосрочному успеху.",
-        icon: <Activity className="w-5 h-5" />
-      }
-    ]
-  }
-];
-
 export const WhyChoose = () => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("premium");
   const headingRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
-  const userChangedTabRef = useRef(false);
+
+  const getPackageTranslations = (packageId: string, type: 'whyChoose' | 'whyWorks', index: number) => {
+    const key = `whyChoose.packages.${packageId}.${type}.${index}`;
+    return {
+      title: t(`${key}.title`),
+      description: t(`${key}.description`)
+    };
+  };
+
+  const packages: PackageInfo[] = [
+    {
+      id: "premium",
+      title: t("whyChoose.packages.premium.title"),
+      whyChoose: [
+        {
+          title: getPackageTranslations("premium", "whyChoose", 0).title,
+          description: getPackageTranslations("premium", "whyChoose", 0).description,
+          icon: <Sparkles className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("premium", "whyChoose", 1).title,
+          description: getPackageTranslations("premium", "whyChoose", 1).description,
+          icon: <Target className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("premium", "whyChoose", 2).title,
+          description: getPackageTranslations("premium", "whyChoose", 2).description,
+          icon: <Shield className="w-5 h-5" />
+        }
+      ],
+      whyWorks: [
+        {
+          title: getPackageTranslations("premium", "whyWorks", 0).title,
+          description: getPackageTranslations("premium", "whyWorks", 0).description,
+          icon: <Microscope className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("premium", "whyWorks", 1).title,
+          description: getPackageTranslations("premium", "whyWorks", 1).description,
+          icon: <RefreshCw className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("premium", "whyWorks", 2).title,
+          description: getPackageTranslations("premium", "whyWorks", 2).description,
+          icon: <Users className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("premium", "whyWorks", 3).title,
+          description: getPackageTranslations("premium", "whyWorks", 3).description,
+          icon: <Handshake className="w-5 h-5" />
+        }
+      ]
+    },
+    {
+      id: "basic",
+      title: t("whyChoose.packages.basic.title"),
+      whyChoose: [
+        {
+          title: getPackageTranslations("basic", "whyChoose", 0).title,
+          description: getPackageTranslations("basic", "whyChoose", 0).description,
+          icon: <TrendingUp className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("basic", "whyChoose", 1).title,
+          description: getPackageTranslations("basic", "whyChoose", 1).description,
+          icon: <CheckCircle2 className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("basic", "whyChoose", 2).title,
+          description: getPackageTranslations("basic", "whyChoose", 2).description,
+          icon: <Sparkles className="w-5 h-5" />
+        }
+      ],
+      whyWorks: [
+        {
+          title: getPackageTranslations("basic", "whyWorks", 0).title,
+          description: getPackageTranslations("basic", "whyWorks", 0).description,
+          icon: <UserCheck className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("basic", "whyWorks", 1).title,
+          description: getPackageTranslations("basic", "whyWorks", 1).description,
+          icon: <Heart className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("basic", "whyWorks", 2).title,
+          description: getPackageTranslations("basic", "whyWorks", 2).description,
+          icon: <Clock className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("basic", "whyWorks", 3).title,
+          description: getPackageTranslations("basic", "whyWorks", 3).description,
+          icon: <Award className="w-5 h-5" />
+        }
+      ]
+    },
+    {
+      id: "mini-group",
+      title: t("whyChoose.packages.mini-group.title"),
+      whyChoose: [
+        {
+          title: getPackageTranslations("mini-group", "whyChoose", 0).title,
+          description: getPackageTranslations("mini-group", "whyChoose", 0).description,
+          icon: <Target className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("mini-group", "whyChoose", 1).title,
+          description: getPackageTranslations("mini-group", "whyChoose", 1).description,
+          icon: <Users className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("mini-group", "whyChoose", 2).title,
+          description: getPackageTranslations("mini-group", "whyChoose", 2).description,
+          icon: <Calendar className="w-5 h-5" />
+        }
+      ],
+      whyWorks: [
+        {
+          title: getPackageTranslations("mini-group", "whyWorks", 0).title,
+          description: getPackageTranslations("mini-group", "whyWorks", 0).description,
+          icon: <Zap className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("mini-group", "whyWorks", 1).title,
+          description: getPackageTranslations("mini-group", "whyWorks", 1).description,
+          icon: <BookOpen className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("mini-group", "whyWorks", 2).title,
+          description: getPackageTranslations("mini-group", "whyWorks", 2).description,
+          icon: <Shield className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("mini-group", "whyWorks", 3).title,
+          description: getPackageTranslations("mini-group", "whyWorks", 3).description,
+          icon: <Brain className="w-5 h-5" />
+        }
+      ]
+    },
+    {
+      id: "curator",
+      title: t("whyChoose.packages.curator.title"),
+      whyChoose: [
+        {
+          title: getPackageTranslations("curator", "whyChoose", 0).title,
+          description: getPackageTranslations("curator", "whyChoose", 0).description,
+          icon: <UserCheck className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("curator", "whyChoose", 1).title,
+          description: getPackageTranslations("curator", "whyChoose", 1).description,
+          icon: <Target className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("curator", "whyChoose", 2).title,
+          description: getPackageTranslations("curator", "whyChoose", 2).description,
+          icon: <Clock className="w-5 h-5" />
+        }
+      ],
+      whyWorks: [
+        {
+          title: getPackageTranslations("curator", "whyWorks", 0).title,
+          description: getPackageTranslations("curator", "whyWorks", 0).description,
+          icon: <Activity className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("curator", "whyWorks", 1).title,
+          description: getPackageTranslations("curator", "whyWorks", 1).description,
+          icon: <BarChart3 className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("curator", "whyWorks", 2).title,
+          description: getPackageTranslations("curator", "whyWorks", 2).description,
+          icon: <Users className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("curator", "whyWorks", 3).title,
+          description: getPackageTranslations("curator", "whyWorks", 3).description,
+          icon: <CheckCircle2 className="w-5 h-5" />
+        }
+      ]
+    },
+    {
+      id: "nutrition",
+      title: t("whyChoose.packages.nutrition.title"),
+      whyChoose: [
+        {
+          title: getPackageTranslations("nutrition", "whyChoose", 0).title,
+          description: getPackageTranslations("nutrition", "whyChoose", 0).description,
+          icon: <Lightbulb className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("nutrition", "whyChoose", 1).title,
+          description: getPackageTranslations("nutrition", "whyChoose", 1).description,
+          icon: <Heart className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("nutrition", "whyChoose", 2).title,
+          description: getPackageTranslations("nutrition", "whyChoose", 2).description,
+          icon: <Brain className="w-5 h-5" />
+        }
+      ],
+      whyWorks: [
+        {
+          title: getPackageTranslations("nutrition", "whyWorks", 0).title,
+          description: getPackageTranslations("nutrition", "whyWorks", 0).description,
+          icon: <BarChart3 className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("nutrition", "whyWorks", 1).title,
+          description: getPackageTranslations("nutrition", "whyWorks", 1).description,
+          icon: <Users className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("nutrition", "whyWorks", 2).title,
+          description: getPackageTranslations("nutrition", "whyWorks", 2).description,
+          icon: <BookOpen className="w-5 h-5" />
+        },
+        {
+          title: getPackageTranslations("nutrition", "whyWorks", 3).title,
+          description: getPackageTranslations("nutrition", "whyWorks", 3).description,
+          icon: <Activity className="w-5 h-5" />
+        }
+      ]
+    }
+  ];
 
   const handleTabChange = (value: string) => {
-    userChangedTabRef.current = true;
     setActiveTab(value);
-
-    // Scroll to heading with delay to ensure DOM is updated
+    
     setTimeout(() => {
       const heading = headingRefs.current[value];
       if (heading) {
-        const isMobile = window.innerWidth < 768;
-        const offset = isMobile ? 220 : 140; // Larger offset for mobile
+        const offset = window.innerWidth < 768 ? 320 : 200; // navbar(64) + sticky tabs(~90) + запас
         const elementPosition = heading.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({
           top: elementPosition - offset,
@@ -280,103 +289,126 @@ export const WhyChoose = () => {
     }, 50);
   };
 
-  useEffect(() => {
-    if (!userChangedTabRef.current) return;
-    userChangedTabRef.current = false;
-  }, [activeTab]);
-
   return (
-    <section className="py-20 md:py-28 px-4 relative">
-      <div className="max-w-7xl mx-auto">
+    <section className={`${DESIGN_TOKENS.sectionPadding} relative`}>
+      <div className={DESIGN_TOKENS.container}>
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight md:leading-snug">
-            Что делает наши <span className="gradient-text">программы эффективными</span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Узнайте подробнее о каждом формате сопровождения
-          </p>
+          <div className={`${DESIGN_TOKENS.heading.h2} flex flex-wrap justify-center items-center gap-x-2 mb-6`}>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              {t("whyChoose.title")}
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="gradient-text"
+            >
+              {t("whyChoose.titleHighlight")}
+            </motion.span>
+          </div>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={`${DESIGN_TOKENS.text.muted} max-w-2xl mx-auto`}
+          >
+            {t("whyChoose.subtitle")}
+          </motion.p>
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          {/* Sticky tabs */}
-          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4">
-            <TabsList className="w-full flex flex-wrap justify-center gap-2 h-auto bg-transparent">
-              {packages.map((pkg) => (
-                <TabsTrigger
-                  key={pkg.id}
-                  value={pkg.id}
-                  className="px-4 py-3 text-sm md:text-base font-medium rounded-full border border-border/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-all duration-300 hover:border-primary/50"
-                >
-                  {pkg.title}
-                </TabsTrigger>
-              ))}
+          <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-xl py-3 sm:py-6 -mx-4 px-4 mb-12 sm:mb-16 shadow-sm">
+            <TabsList className="w-full flex flex-wrap justify-center gap-2 sm:gap-3 h-auto bg-transparent">
+              {packages.map((pkg) => {
+                const titleKey = `whyChoose.packages.${pkg.id}.title`;
+                const translatedTitle = t(titleKey) !== titleKey ? t(titleKey) : pkg.title;
+                return (
+                  <TabsTrigger
+                    key={pkg.id}
+                    value={pkg.id}
+                    className="px-4 sm:px-6 py-2 sm:py-3 text-sm md:text-base font-semibold rounded-full border border-white/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all duration-300 hover:bg-white/5"
+                  >
+                    {translatedTitle}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </div>
 
-          <div className="mt-8">
-            {packages.map((pkg) => (
-              <TabsContent
-                key={pkg.id}
-                value={pkg.id}
-                className="animate-fade-in transition-all duration-500 ease-out data-[state=active]:opacity-100 data-[state=active]:translate-y-0 data-[state=inactive]:opacity-0 data-[state=inactive]:translate-y-4"
-              >
-                <div className="space-y-8">
-                  {/* Why Choose Section */}
-                  <div>
-                    <h3
-                      ref={(el) => {
-                        headingRefs.current[pkg.id] = el;
-                      }}
-                      className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3 scroll-mt-40"
-                    >
-                      <span className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                      </span>
-                      Почему выбирают «{pkg.title}»?
-                    </h3>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      {pkg.whyChoose.map((item, index) => (
-                        <div
-                          key={index}
-                          className="group p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                            <span className="text-primary">{item.icon}</span>
-                          </div>
-                          <h4 className="font-semibold text-lg mb-2">{item.title}</h4>
-                          <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              {packages.map((pkg) => (
+                <TabsContent key={pkg.id} value={pkg.id} className="mt-0 outline-none">
+                  <div className="space-y-16">
+                    {/* Why Choose Section */}
+                    <div className="space-y-8">
+                      <h3
+                        ref={(el) => (headingRefs.current[pkg.id] = el)}
+                        className={`${DESIGN_TOKENS.heading.h3} flex items-center gap-4 scroll-mt-[200px]`}
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+                          <Sparkles className="w-6 h-6" />
                         </div>
-                      ))}
+                        {t("whyChoose.whyChoose", { package: pkg.title })}
+                      </h3>
+                      
+                      <div className="grid md:grid-cols-3 gap-6">
+                        {pkg.whyChoose.map((item, index) => (
+                          <div
+                            key={index}
+                            className={`p-8 ${DESIGN_TOKENS.card} ${DESIGN_TOKENS.shadow.sm} hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full`}
+                          >
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors flex-shrink-0">
+                              <span className="text-primary">{item.icon}</span>
+                            </div>
+                            <h4 className="text-lg font-bold mb-3">{item.title}</h4>
+                            <p className={`${DESIGN_TOKENS.text.muted} flex-grow`}>{item.description}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Why It Works Section */}
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3">
-                      <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                        <Zap className="w-5 h-5 text-accent" />
-                      </span>
-                      Почему это работает
-                    </h3>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {pkg.whyWorks.map((item, index) => (
-                        <div
-                          key={index}
-                          className="group p-5 rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-border/50 hover:border-accent/30 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5"
-                        >
-                          <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center mb-3 group-hover:bg-accent/20 transition-colors">
-                            <span className="text-accent">{item.icon}</span>
-                          </div>
-                          <h4 className="font-semibold mb-2">{item.title}</h4>
-                          <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                    {/* Why It Works Section */}
+                    <div className="space-y-8">
+                      <h3 className={`${DESIGN_TOKENS.heading.h3} flex items-center gap-4`}>
+                        <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
+                          <Zap className="w-6 h-6" />
                         </div>
-                      ))}
+                        {t("whyChoose.whyWorks")}
+                      </h3>
+                      
+                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {pkg.whyWorks.map((item, index) => (
+                          <div
+                            key={index}
+                            className={`p-6 ${DESIGN_TOKENS.card} bg-gradient-to-br from-card/50 to-transparent hover:border-accent/30 hover:-translate-y-1 transition-all duration-300 group`}
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:bg-accent/20 transition-colors">
+                              <span className="text-accent">{item.icon}</span>
+                            </div>
+                            <h4 className="text-lg font-bold mb-2">{item.title}</h4>
+                            <p className={`${DESIGN_TOKENS.text.muted}`}>{item.description}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
-            ))}
-          </div>
+                </TabsContent>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </Tabs>
       </div>
     </section>

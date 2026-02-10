@@ -1,76 +1,85 @@
+/**
+ * CTA — секция призыва к действию
+ * Full-width gradient фон, увеличенные кнопки Telegram + Max,
+ * без статов (перенесены в Hero).
+ */
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import maxLogo from "@/assets/max-logo.png";
-import { useCountUp } from "@/hooks/useCountUp";
-
-const AnimatedStat = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
-  const { count, ref } = useCountUp(value, 2000);
-
-  return (
-    <div ref={ref} className="text-center">
-      <div className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-2">
-        {'>'}{count}{suffix}
-      </div>
-      <div className="text-xs sm:text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-};
+import maxLogoWebp from "@/assets/max-logo.webp";
+import maxLogoPng from "@/assets/max-logo.png";
+import { useI18n } from "@/hooks/useI18n";
+import { Reveal } from "./animations/Reveal";
+import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
 export const CTA = () => {
+  const { t } = useI18n();
+
   return (
-    <section className="py-20 md:py-28 px-4 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-[150px] animate-glow" />
+    <section id="cta" className="relative py-24 md:py-32 overflow-visible">
+      {/* Background with subtle gradient mesh — clip only the bg */}
+      <div className="absolute inset-0 -z-10 bg-muted/30 overflow-hidden">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center space-y-6 md:space-y-8">
-          <div className="inline-block animate-float">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 md:mb-6 flex items-center justify-center">
-              <Send className="w-8 h-8 md:w-10 md:h-10 text-background" />
+      <div className={`${DESIGN_TOKENS.container} px-6 md:px-12 relative z-10`}>
+        {/* Card Component */}
+        <div className="relative max-w-4xl mx-auto rounded-[2.5rem] bg-white border border-primary/5 px-6 py-12 md:px-12 md:py-20 text-center transform-gpu overflow-visible card-drop-shadow">
+          
+          {/* Decorative background inside card — clipped to rounded shape */}
+          <div className="absolute inset-0 pointer-events-none rounded-[2.5rem] overflow-hidden">
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.8)_100%)]" />
+          </div>
+
+          <div className="relative z-10 w-full mx-auto text-center flex flex-col items-center">
+            {/* Heading + subtitle — полная ширина Reveal и явное центрирование */}
+            <div className="w-full max-w-2xl mx-auto text-center">
+              <Reveal width="100%" overflow="visible">
+                <h2 className={`${DESIGN_TOKENS.heading.h2} mb-6 text-center`}>
+                  {t("cta.title")} <br />
+                  <span className="gradient-text">{t("cta.titleHighlight")}</span>
+                </h2>
+              </Reveal>
+
+              <Reveal width="100%" overflow="visible" delay={0.1}>
+                <p className={`${DESIGN_TOKENS.text.large} mb-10 text-muted-foreground text-center`}>
+                  {t("cta.subtitle")}
+                </p>
+              </Reveal>
             </div>
-          </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight md:leading-snug">
-            Готовы изменить <br />
-            <span className="gradient-text">свой образ жизни?</span>
-          </h2>
+            {/* Buttons — Reveal не режет при scale */}
+            <Reveal width="100%" overflow="visible" delay={0.2}>
+              <div className="w-full flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  size="lg"
+                  className="btn-shimmer btn-cta-shadow w-full sm:w-56 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 text-lg font-semibold hover:scale-[1.02] active:scale-[0.98] group transition-all duration-300"
+                  asChild
+                >
+                  <a href="https://t.me/Elena_fitmentor" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                    <Send className="mr-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    {t("cta.telegram")}
+                  </a>
+                </Button>
 
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Напишите мне, чтобы узнать детали и начать путь к себе обновленной
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 md:pt-8">
-            <Button
-              size="lg"
-              className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 min-w-[200px] sm:min-w-[240px]"
-              asChild
-            >
-              <a href="https://t.me/Elena_fittrainer" target="_blank" rel="noopener noreferrer">
-                <Send className="mr-2 group-hover:translate-x-1 transition-transform" />
-                Написать в Telegram
-              </a>
-            </Button>
-
-            <Button
-              size="lg"
-              variant="outline"
-              className="group border-2 border-primary/50 hover:border-primary hover:bg-primary/10 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 min-w-[200px] sm:min-w-[240px]"
-              asChild
-            >
-              <a href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE" target="_blank" rel="noopener noreferrer">
-                <img src={maxLogo} alt="Max" className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
-                Написать в Max
-              </a>
-            </Button>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-10 md:pt-16 max-w-2xl mx-auto">
-            <AnimatedStat value={300} suffix="+" label="Довольных клиентов" />
-            <AnimatedStat value={11} suffix=" лет" label="Опыта в фитнесе" />
-            <AnimatedStat value={98} suffix="%" label="Успешных результатов" />
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="btn-cta-shadow w-full sm:w-56 rounded-full border-2 border-primary/10 hover:border-primary/30 hover:bg-primary/5 text-foreground hover:text-foreground h-14 text-lg group transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] bg-transparent"
+                  asChild
+                >
+                  <a href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                    <picture className="flex items-center">
+                      <source srcSet={maxLogoWebp} type="image/webp" />
+                      <img src={maxLogoPng} alt="Max" width={24} height={24} loading="lazy" className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                    </picture>
+                    {t("cta.max")}
+                  </a>
+                </Button>
+              </div>
+            </Reveal>
           </div>
         </div>
       </div>

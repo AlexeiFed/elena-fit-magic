@@ -1,139 +1,134 @@
-import { Check, ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+/**
+ * ServiceCard — карточка услуги
+ * Поддерживает featured mode (для Премиум): gradient border,
+ * badge «Популярное», увеличенная тень, shimmer CTA.
+ */
+import { Check, ChevronRight, Star } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 import { RegistrationModal } from "./RegistrationModal";
 import { serviceDetails } from "./serviceDetails";
+import { useI18n } from "@/hooks/useI18n";
+import { motion } from "framer-motion";
+import { DESIGN_TOKENS } from "@/lib/design-tokens";
+import { cn } from "@/lib/utils";
 
 interface ServiceCardProps {
+  id: string;
   title: string;
   subtitle: string;
   features: string[];
   index: number;
   totalCards: number;
+  featured?: boolean;
 }
 
-export const ServiceCard = ({ title, subtitle, features, index, totalCards }: ServiceCardProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const ServiceCard = ({ id, title, subtitle, features, index, totalCards, featured = false }: ServiceCardProps) => {
+  const { t } = useI18n();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
-  const ref = useRef<HTMLDivElement>(null);
 
-  const detailData = serviceDetails[title] || null;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const rotateX = (e.clientY - centerY) / 20;
-    const rotateY = (centerX - e.clientX) / 20;
-    setRotation({ x: rotateX, y: rotateY });
-  };
-
-  const handleMouseLeave = () => {
-    setRotation({ x: 0, y: 0 });
-  };
-
-  // Calculate staggered delay based on card position
-  const row = Math.floor(index / 3);
-  const col = index % 3;
-  const delay = (row * 100) + (col * 100);
+  const detailData = serviceDetails[id] || null;
 
   return (
-    <div
-      ref={ref}
-      className="relative h-full"
-      style={{
-        perspective: "1000px",
-        animation: isVisible
-          ? `fadeInUp 0.6s ease-out ${delay}ms both`
-          : 'none',
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0 }
       }}
+      transition={{ duration: 0.5 }}
+      className="relative h-full"
     >
-      <div
-        className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] h-full"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateZ(0)`,
-          transformStyle: "preserve-3d",
-          transition: rotation.x === 0 && rotation.y === 0
-            ? "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
-            : "transform 0.1s ease-out",
-          willChange: 'transform',
-          backfaceVisibility: 'hidden',
-        }}
+      {/* Мягкий gradient glow для featured card */}
+      {featured && (
+        <div className="absolute -inset-[1px] rounded-[calc(1.5rem+1px)] bg-gradient-to-br from-primary/30 via-accent/20 to-primary/15 -z-10" />
+      )}
+
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className={cn(
+          "group relative overflow-hidden h-full flex flex-col p-7 md:p-8 rounded-3xl border transition-all duration-300",
+          featured
+            ? "bg-card border-primary/15 shadow-xl shadow-primary/10"
+            : "bg-card/80 backdrop-blur-sm border-border/30 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20"
+        )}
       >
-        {/* Glow effect on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+        {/* Фоновый glow при ховере */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        <div className="relative bg-card border border-border/50 group-hover:border-primary/50 rounded-3xl p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 h-full flex flex-col">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Featured badge */}
+        {featured && (
+          <div className="absolute top-4 right-4 z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary">
+              <Star className="w-3 h-3 fill-primary" />
+              {t("services.card.popular") || "Популярное"}
+            </span>
+          </div>
+        )}
 
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 pr-12">
+        {/* Top accent line */}
+        <div className={cn(
+          "absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent transition-opacity duration-500 pointer-events-none",
+          featured ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        )} />
+
+        {/* Заголовок */}
+        <div className="mb-4 relative z-10">
+          <h3 className={cn(
+            "text-xl md:text-2xl font-bold transition-colors duration-300",
+            featured ? "text-primary" : "group-hover:text-primary"
+          )}>
             {title}
           </h3>
-          <p className="text-muted-foreground text-sm md:text-base mb-4">{subtitle}</p>
-
-          <ul className="space-y-2 flex-grow">
-            {features.map((feature, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2 group/item"
-              >
-                <div className="mt-0.5 flex-shrink-0">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center group-hover/item:bg-primary/20 transition-colors duration-300">
-                    <Check className="w-3 h-3 text-primary" />
-                  </div>
-                </div>
-                <span className="text-sm text-foreground/90 leading-relaxed">{feature}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* Details and registration buttons */}
-          <div className="mt-4 pt-4 border-t border-border/30 flex gap-2">
-            <Button
-              className="flex-1 gradient-button"
-              onClick={() => setIsRegistrationOpen(true)}
-            >
-              Выбрать
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex-1 justify-between text-primary hover:text-primary hover:bg-primary/10 group/btn"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span>Подробнее</span>
-              <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-            </Button>
-          </div>
-
-          {/* Card number indicator */}
-          <div className="absolute top-6 right-6 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm sm:text-base">
-            {index + 1}
-          </div>
         </div>
-      </div>
+
+        <p className="text-sm text-muted-foreground mb-6 relative z-10">
+          {subtitle}
+        </p>
+
+        {/* Features list */}
+        <ul className="space-y-3 flex-grow mb-6 relative z-10">
+          {features.map((feature, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <div className="mt-0.5 flex-shrink-0">
+                <div className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-300",
+                  featured ? "bg-primary/15" : "bg-primary/10"
+                )}>
+                  <Check className="w-3 h-3 text-primary" />
+                </div>
+              </div>
+              <span className="text-sm text-foreground/80 leading-relaxed">{feature}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Кнопки */}
+        <div className="mt-auto pt-5 border-t border-border/20 flex flex-col sm:flex-row gap-3 relative z-10">
+          <Button
+            className={cn(
+              "flex-1 rounded-full text-sm shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]",
+              featured
+                ? "btn-shimmer bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20"
+                : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/10"
+            )}
+            onClick={() => setIsRegistrationOpen(true)}
+          >
+            {t("services.card.select")}
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-full justify-center text-primary hover:text-primary hover:bg-primary/5 group/btn text-sm"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span>{t("services.card.details")}</span>
+            <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+          </Button>
+        </div>
+      </motion.div>
 
       <ServiceDetailModal
         isOpen={isModalOpen}
@@ -144,8 +139,8 @@ export const ServiceCard = ({ title, subtitle, features, index, totalCards }: Se
       <RegistrationModal
         isOpen={isRegistrationOpen}
         onClose={() => setIsRegistrationOpen(false)}
-        serviceName={title}
+        serviceName={id}
       />
-    </div>
+    </motion.div>
   );
 };

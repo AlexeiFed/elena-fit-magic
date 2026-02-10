@@ -1,222 +1,137 @@
-import { Heart, Sparkles, Target, Zap } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import elenaAbout from "@/assets/elena-about.jpg";
-
-interface TooltipPosition {
-  x: number;
-  y: number;
-}
+/**
+ * About — секция «Обо мне»
+ * Bento grid layout: фото слева (sticky), справа — описание,
+ * numbered steps (вместо hover-тултипов), badge регалии.
+ * Анимации через Reveal (framer-motion whileInView).
+ */
+import { Heart, Sparkles, Target, Zap, Award } from "lucide-react";
+import elenaAboutWebp from "@/assets/elena-about.webp";
+import elenaAboutJpg from "@/assets/elena-about.jpg";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useI18n } from "@/hooks/useI18n";
+import { motion } from "framer-motion";
+import { Reveal } from "./animations/Reveal";
+import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
 export const About = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ x: 0, y: 0 });
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const { t } = useI18n();
 
   const features = [
-    {
-      icon: Heart,
-      text: "Здоровье",
-      description: "Комплексный подход к вашему здоровью: анализ показателей, работа с врачами и создание устойчивых привычек для долгосрочного результата."
-    },
-    {
-      icon: Zap,
-      text: "Энергия",
-      description: "Восстановление энергетического баланса через правильное питание, режим сна и физическую активность для максимальной продуктивности."
-    },
-    {
-      icon: Sparkles,
-      text: "Питание",
-      description: "Индивидуальный план питания на основе ваших целей, предпочтений и особенностей организма — без жёстких диет и ограничений."
-    },
-    {
-      icon: Target,
-      text: "Цели",
-      description: "Постановка реалистичных целей и пошаговая стратегия их достижения с регулярным отслеживанием прогресса и корректировкой плана."
-    },
+    { icon: Heart, text: t("about.feature.health"), description: t("about.feature.healthDesc") },
+    { icon: Zap, text: t("about.feature.energy"), description: t("about.feature.energyDesc") },
+    { icon: Sparkles, text: t("about.feature.nutrition"), description: t("about.feature.nutritionDesc") },
+    { icon: Target, text: t("about.feature.goals"), description: t("about.feature.goalsDesc") },
   ];
 
-  const handleCardInteraction = (text: string, index: number, event: React.MouseEvent | React.TouchEvent) => {
-    const target = event.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const tooltipWidth = 320;
-    const tooltipHeight = 100;
-    const x = rect.left + rect.width / 2 - tooltipWidth / 2;
-    const y = rect.top - tooltipHeight - 12;
-    setTooltipPosition({ x, y });
-    setActiveTooltip(text);
-  };
-
-  const handleMouseLeave = () => {
-    setActiveTooltip(null);
-  };
-
-  // Hide tooltip on scroll/touchmove for mobile devices
-  useEffect(() => {
-    if (!activeTooltip) return;
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    if (!isMobile) return;
-
-    const hide = () => setActiveTooltip(null);
-    window.addEventListener('scroll', hide, { passive: true });
-    window.addEventListener('touchmove', hide, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', hide);
-      window.removeEventListener('touchmove', hide as any);
-    };
-  }, [activeTooltip]);
+  const regalia = [t("about.regalia1"), t("about.regalia2")];
 
   return (
-    <section ref={ref} className="py-20 md:py-28 px-4 relative">
-      <div className="max-w-7xl mx-auto">
-        <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 leading-tight md:leading-snug">
-            Меня зовут <span className="gradient-text">Елена Пильщикова</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground text-center mb-6">
-            Фитнес тренер международного уровня, нутрициолог, наставник
-          </p>
+    <section id="about" className={`${DESIGN_TOKENS.section.alt} relative overflow-hidden`}>
+      <div className={DESIGN_TOKENS.container}>
+        {/* Заголовок секции */}
+        <div className="text-center mb-16 md:mb-20">
+          <Reveal>
+            <h2 className={`${DESIGN_TOKENS.heading.h2}`}>
+              {t("about.title")}{" "}
+              <span className="gradient-text">{t("about.titleHighlight")}</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className={`${DESIGN_TOKENS.text.large} max-w-2xl mx-auto`}>
+              {t("about.subtitle")}
+            </p>
+          </Reveal>
+        </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-stretch mt-16">
-            {/* Image */}
-            <div className="relative order-2 md:order-1">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl h-auto md:h-[1020px]">
-                <img
-                  src={elenaAbout}
-                  alt="Елена Пильщикова - чемпион по фитнес-бикини"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
-              </div>
-              {/* Decorative glow */}
-              <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-3xl -z-10 opacity-50" />
-              {/* Regalia - mobile (shown under photo) */}
-              <div className="mt-6 block md:hidden">
-                <div className="bg-card border border-border/50 rounded-2xl p-4 w-full text-lg">
-                  <h4 className="text-base font-semibold mb-2 text-left text-lg">Регалии</h4>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-3">
-                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                      <span>Чемпионка Дальнего Востока по бодибилдингу в категории эстетический фитнес 2014 г. (Гран-при Амур)</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                      <span>Бронзовая призерка Приморского края Российской Федерации по бодибилдингу в категории эстетический фитнес в 2024 г.</span>
-                    </li>
-                  </ul>
+        {/* Bento grid: фото + контент */}
+        <div className="grid lg:grid-cols-[0.85fr_1fr] gap-10 lg:gap-16 items-start">
+          {/* === Фото колонка (sticky на десктопе) === */}
+          <Reveal delay={0.2}>
+            <div className="lg:sticky lg:top-28">
+              <div className="relative group rounded-[2.5rem] overflow-hidden border border-border/10 transform-gpu will-change-transform isolate card-drop-shadow-about">
+                <div className="relative aspect-[3/4] lg:aspect-[3/4] overflow-hidden rounded-[2.5rem] [border-radius:inherit]">
+                  <OptimizedImage
+                    webpSrc={elenaAboutWebp}
+                    fallbackSrc={elenaAboutJpg}
+                    alt={t("about.titleHighlight")}
+                    width={720}
+                    height={1280}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 rounded-[2.5rem] [border-radius:inherit]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent" />
                 </div>
               </div>
+
+              {/* Decorative elements */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl -z-10" />
+              <div className="absolute -top-6 -left-6 w-32 h-32 bg-accent/20 rounded-full blur-3xl -z-10" />
+            </div>
+          </Reveal>
+
+          {/* === Контент колонка === */}
+          <div className="space-y-10">
+            {/* Описание — три абзаца */}
+            <div className="space-y-5">
+              {[t("about.description1"), t("about.description2"), t("about.description3")].map((desc, i) => (
+                <Reveal key={i} delay={0.2 + i * 0.1}>
+                  <p className={DESIGN_TOKENS.text.muted}>{desc}</p>
+                </Reveal>
+              ))}
             </div>
 
-            <div className="flex flex-col justify-center h-full order-1 md:order-2">
-              <div className="space-y-8 md:space-y-10">
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Я — ваш персональный проводник в мире здоровья и фитнеса. Выстраиваю стратегию не просто под тело, а под ваш образ жизни, цели и состояние здоровья.
-                </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  В своей работе я опираюсь не только на личную экспертизу, но и на команду специалистов, с которыми мы сопровождаем вас комплексно и безопасно — от питания и тренировок до вашего желаемого результата, восстановления и самочувствия.
-                </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Моя миссия — помочь вам изменить отношение к телу, питанию и себе, чтобы результат стал частью вашей жизни.
-                </p>
-
-                <div className="flex hidden md:flex w-full">
-                  <div className="bg-card border border-border/50 rounded-2xl p-4 w-full text-sm md:text-lg">
-                    <h4 className="text-lg font-semibold mb-3 text-left text-primary">Регалии</h4>
-                    <ul className="space-y-2 text-muted-foreground">
-                      <li className="flex items-start gap-3">
-                        <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                        <span>
-                          Чемпионка Дальнего Востока по бодибилдингу в категории эстетический фитнес 2014 г. (Гран-при Амур)
+            {/* Numbered steps — bento cards (вместо hover-тултипов) */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              {features.map((feature, index) => (
+                <Reveal key={feature.text} delay={0.3 + index * 0.08}>
+                  <motion.div
+                    whileHover={{ y: -4 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="group p-5 rounded-2xl bg-card/60 backdrop-blur-sm border border-border/30 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden transform-gpu"
+                  >
+                    {/* Номер шага + иконка */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="relative w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <feature.icon className="w-5 h-5 text-primary" />
+                        {/* Numbered badge */}
+                        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                          {index + 1}
                         </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="mt-1 w-2 h-2 rounded-full bg-primary/70 flex-shrink-0" />
-                        <span>
-                          Бронзовая призерка Приморского края Российской Федерации по бодибилдингу в категории эстетический фитнес в 2024 г.
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-8 md:pt-10">
-                {features.map((feature, index) => {
-                  const isLeftSide = index % 2 === 0;
-                  const animationClass = isLeftSide ? 'animate-slide-in-left' : 'animate-slide-in-right';
-
-                  return (
-                    <div
-                      key={feature.text}
-                      className={`relative p-6 bg-card rounded-2xl border border-border/50 hover:border-primary/50 transition-all duration-300 cursor-pointer group ${isVisible ? animationClass : 'opacity-0'
-                        }`}
-                      style={{
-                        animationFillMode: 'both',
-                        animationDelay: `${index * 100}ms`,
-                      }}
-                      onMouseEnter={(e) => handleCardInteraction(feature.text, index, e)}
-                      onMouseLeave={handleMouseLeave}
-                      onTouchStart={(e) => handleCardInteraction(feature.text, index, e as any)}
-                      onTouchEnd={handleMouseLeave}
-                    >
-                      <div className="flex items-center gap-2 md:gap-4 min-w-0">
-                        <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors duration-300">
-                          <feature.icon className="w-5 h-5 md:w-6 md:h-6" />
-                        </div>
-                        <h3 className="text-sm md:text-lg font-semibold group-hover:text-primary transition-colors duration-300 truncate">
-                          {feature.text}
-                        </h3>
                       </div>
+                      <h3 className="text-base font-semibold group-hover:text-primary transition-colors">
+                        {feature.text}
+                      </h3>
                     </div>
-                  );
-                })}
-              </div>
+                    {/* Описание — всегда видимо */}
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </motion.div>
+                </Reveal>
+              ))}
             </div>
           </div>
         </div>
-      </div>
 
-      {activeTooltip && createPortal(
-        <div
-          className="fixed z-[100] pointer-events-none"
-          style={{
-            left: `${Math.max(8, Math.min(tooltipPosition.x, window.innerWidth - 328))}px`,
-            top: `${Math.max(8, tooltipPosition.y)}px`,
-            width: "320px",
-          }}
-        >
-          <div className="relative p-4 bg-card border border-border rounded-lg shadow-lg" style={{
-            animation: "tooltipFadeIn 0.25s ease-out forwards",
-          }}>
-            <p className="text-sm text-muted-foreground">
-              {features.find(f => f.text === activeTooltip)?.description}
-            </p>
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-card border-b border-r border-border transform rotate-45" />
+        {/* Регалии — на всю ширину под основным контентом */}
+        <div className="mt-16 md:mt-20">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+            {regalia.map((item, i) => (
+              <Reveal key={i} delay={0.4 + i * 0.1}>
+                <div className="relative group rounded-3xl bg-white dark:bg-card border border-primary/10 transition-all duration-300 h-full overflow-hidden transform-gpu isolate card-drop-shadow-about">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative p-7 flex items-start gap-5 text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <Award className="w-7 h-7 text-primary" />
+                    </div>
+                    <p className="text-base md:text-lg font-medium text-foreground/90 leading-relaxed pt-1">{item}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
-        </div>,
-        document.body
-      )}
+        </div>
+      </div>
     </section>
   );
 };

@@ -1,0 +1,40 @@
+{
+  "items": [
+    {
+      "id": "s1",
+      "src": "/screenshots/chat-1.jpg",
+      "caption": "Результат за 2 месяца",
+      "order": 0
+    },
+    {
+      "id": "s2",
+      "src": "/screenshots/chat-2.jpg",
+      "caption": "Отзыв после программы питания",
+      "order": 1
+    },
+    {
+      "id": "s3",
+      "src": "/screenshots/chat-3.jpg",
+      "caption": "Прогресс за 3 месяца",
+      "order": 2
+    },
+    {
+      "id": "s4",
+      "src": "/screenshots/chat-4.jpg",
+      "caption": "Обратная связь по тренировкам",
+      "order": 3
+    },
+    {
+      "id": "s5",
+      "src": "/screenshots/chat-5.jpg",
+      "caption": "Результат трансформации",
+      "order": 4
+    },
+    {
+      "id": "s6",
+      "src": "/screenshots/chat-6.jpg",
+      "caption": "Благодарность после курса",
+      "order": 5
+    }
+  ]
+}

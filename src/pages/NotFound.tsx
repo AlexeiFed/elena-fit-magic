@@ -1,11 +1,17 @@
+/**
+ * Страница 404 — «Страница не найдена»
+ * Локализована через систему useI18n() — поддерживает RU и EN
+ */
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowRight } from "lucide-react";
+import { useI18n } from "@/hooks/useI18n";
 
 const NotFound = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
@@ -24,13 +30,13 @@ const NotFound = () => {
         {/* Message */}
         <div className="mb-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Страница не найдена
+            {t("notFound.title")}
           </h2>
           <p className="text-lg text-muted-foreground mb-2">
-            К сожалению, страница, которую вы ищете, не существует или была перемещена.
+            {t("notFound.description")}
           </p>
           <p className="text-sm text-muted-foreground">
-            Путь: <code className="text-xs bg-card px-2 py-1 rounded">{location.pathname}</code>
+            {t("notFound.pathLabel")} <code className="text-xs bg-card px-2 py-1 rounded">{location.pathname}</code>
           </p>
         </div>
 
@@ -47,7 +53,7 @@ const NotFound = () => {
             onClick={() => navigate("/")}
           >
             <Home className="w-5 h-5" />
-            На главную
+            {t("notFound.goHome")}
           </Button>
           <Button
             variant="outline"
@@ -56,29 +62,29 @@ const NotFound = () => {
             onClick={() => window.history.back()}
           >
             <ArrowRight className="w-5 h-5 rotate-180" />
-            Вернуться назад
+            {t("notFound.goBack")}
           </Button>
         </div>
 
         {/* Helpful links */}
         <div className="mt-12 pt-8 border-t border-border">
           <p className="text-sm text-muted-foreground mb-4">
-            Может быть полезно:
+            {t("notFound.helpfulLinks")}
           </p>
           <ul className="space-y-2 text-sm">
             <li>
               <a href="/#services" className="text-primary hover:underline">
-                Форматы сопровождения
+                {t("notFound.linkServices")}
               </a>
             </li>
             <li>
               <a href="/#about" className="text-primary hover:underline">
-                О программе
+                {t("notFound.linkAbout")}
               </a>
             </li>
             <li>
-              <a href="https://t.me/Elena_fittrainer" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                Связаться со мной
+              <a href="https://t.me/Elena_fitmentor" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                {t("notFound.linkContact")}
               </a>
             </li>
           </ul>

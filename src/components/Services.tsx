@@ -1,100 +1,176 @@
+/**
+ * Services — секция услуг
+ * Featured card для Премиум (gradient border, badge),
+ * категории Training и Nutrition с divider,
+ * staggered entrance анимации.
+ */
 import { ServiceCard } from "./ServiceCard";
+import { useI18n } from "@/hooks/useI18n";
+import { motion } from "framer-motion";
+import { Reveal } from "./animations/Reveal";
+import { DESIGN_TOKENS } from "@/lib/design-tokens";
+
+/** ID Премиум-карточки для featured-режима */
+const FEATURED_ID = "ПРЕМИУМ";
 
 export const Services = () => {
+  const { t } = useI18n();
+
   const services = [
     {
-      title: "ПРЕМИУМ",
-      subtitle: "Личная работа со мной",
+      id: "ПРЕМИУМ",
+      title: t("services.premium.title"),
+      subtitle: t("services.premium.subtitle"),
       features: [
-        "Личное сопровождение со мной",
-        "Разбор анализов крови от доктора",
-        "Индивидуальный план питания",
-        "Программа тренировок под ваши цели",
-        "Ежедневная обратная связь",
-        "Гарантия результата",
+        t("services.premium.feature1"),
+        t("services.premium.feature2"),
+        t("services.premium.feature3"),
+        t("services.premium.feature4"),
+        t("services.premium.feature5"),
+        t("services.premium.feature6"),
       ],
     },
     {
-      title: "БАЗОВЫЙ ФОРМАТ",
-      subtitle: "Для самостоятельных",
+      id: "БАЗОВЫЙ ФОРМАТ",
+      title: t("services.basic.title"),
+      subtitle: t("services.basic.subtitle"),
       features: [
-        "Программа тренировок под ваши цели",
-        "Разбор анализов и рекомендации",
-        "Ежемесячная консультация",
-        "Проверка техники раз в неделю",
-        "Поддержка в чате при необходимости",
+        t("services.basic.feature1"),
+        t("services.basic.feature2"),
+        t("services.basic.feature3"),
+        t("services.basic.feature4"),
+        t("services.basic.feature5"),
       ],
     },
     {
-      title: "МИНИ-ГРУППА",
-      subtitle: "Сила команды и индивидуальный подход",
+      id: "МИНИ-ГРУППА",
+      title: t("services.miniGroup.title"),
+      subtitle: t("services.miniGroup.subtitle"),
       features: [
-        "Группа 6-8 человек",
-        "Групповой чат со мной и куратором",
-        "Индивидуальный разбор анализов",
-        "Базовое обучение по питанию",
-        "План тренировок через приложение",
-        "Групповая сессия с психологом",
+        t("services.miniGroup.feature1"),
+        t("services.miniGroup.feature2"),
+        t("services.miniGroup.feature3"),
+        t("services.miniGroup.feature4"),
+        t("services.miniGroup.feature5"),
+        t("services.miniGroup.feature6"),
       ],
     },
     {
-      title: "СОПРОВОЖДЕНИЕ С КУРАТОРОМ",
-      subtitle: "Постоянный контроль опытного тренера",
+      id: "СОПРОВОЖДЕНИЕ С КУРАТОРОМ",
+      title: t("services.curator.title"),
+      subtitle: t("services.curator.subtitle"),
       features: [
-        "Личный чат с куратором (ежедневно)",
-        "Проверка питания и отчеты еженедельно",
-        "Индивидуальный план тренировок и питания",
-        "Консультации раз в месяц",
-        "Контроль сна и восстановления",
+        t("services.curator.feature1"),
+        t("services.curator.feature2"),
+        t("services.curator.feature3"),
+        t("services.curator.feature4"),
+        t("services.curator.feature5"),
       ],
     },
     {
-      title: "СТАРТ",
-      subtitle: "Нутрициология (1 месяц)",
+      id: "СТАРТ",
+      title: t("services.start.title"),
+      subtitle: t("services.start.subtitle"),
       features: [
-        "Индивидуальный разбор анализов от врача и нутрициолога",
-        "Назначение БАДов на основе результатов",
-        "Индивидуальный план питания и КБЖУ",
-        "Личное наставничество нутрициолога",
-        "Еженедельные отчеты для отслеживания динамики",
+        t("services.start.feature1"),
+        t("services.start.feature2"),
+        t("services.start.feature3"),
+        t("services.start.feature4"),
+        t("services.start.feature5"),
       ],
     },
     {
-      title: "ТРАНСФОРМАЦИЯ",
-      subtitle: "Нутрициология (3 месяца)",
+      id: "ТРАНСФОРМАЦИЯ",
+      title: t("services.transformation.title"),
+      subtitle: t("services.transformation.subtitle"),
       features: [
-        "Всё из «Старта» +",
-        "Ежемесячное обновление плана питания",
-        "Консультация с психологом по пищевому поведению",
-        "Онлайн-консультация с нутрициологом раз в месяц",
-        "Гарантия результата при соблюдении всех планов",
+        t("services.transformation.feature1"),
+        t("services.transformation.feature2"),
+        t("services.transformation.feature3"),
+        t("services.transformation.feature4"),
+        t("services.transformation.feature5"),
       ],
     },
   ];
 
+  const trainingServices = services.slice(0, 4);
+  const nutritionServices = services.slice(4, 6);
+
   return (
-    <section id="services" className="py-20 md:py-28 px-4 relative">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight md:leading-snug mb-4">
-            Форматы <span className="gradient-text">сопровождения</span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Выберите формат, который подходит именно вам
-          </p>
+    <section id="services" className={`${DESIGN_TOKENS.section.default} relative`}>
+      <div className={DESIGN_TOKENS.container}>
+        {/* Заголовок секции */}
+        <div className="text-center mb-16 md:mb-20">
+          <Reveal>
+            <h2 className={DESIGN_TOKENS.heading.h2}>
+              {t("services.title")}{" "}
+              <span className="gradient-text">{t("services.titleHighlight")}</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className={`${DESIGN_TOKENS.text.muted} max-w-2xl mx-auto`}>
+              {t("services.subtitle")}
+            </p>
+          </Reveal>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{
-          gridAutoRows: '1fr'
-        }}>
-          {services.map((service, index) => (
-            <ServiceCard
-              key={service.title}
-              {...service}
-              index={index}
-              totalCards={services.length}
-            />
-          ))}
+        {/* === Категория: Тренировки === */}
+        <div className="mb-20">
+          <div className="flex items-center gap-4 mb-10">
+            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+            <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
+              {t("services.category.training")}
+            </h3>
+            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+            style={{ gridAutoRows: "1fr" }}
+          >
+            {trainingServices.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                {...service}
+                index={index}
+                totalCards={trainingServices.length}
+                featured={service.id === FEATURED_ID}
+              />
+            ))}
+          </motion.div>
+        </div>
+
+        {/* === Категория: Нутрициология === */}
+        <div>
+          <div className="flex items-center gap-4 mb-10">
+            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+            <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
+              {t("services.category.nutrition")}
+            </h3>
+            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
+            style={{ gridAutoRows: "1fr" }}
+          >
+            {nutritionServices.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                {...service}
+                index={index}
+                totalCards={nutritionServices.length}
+              />
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

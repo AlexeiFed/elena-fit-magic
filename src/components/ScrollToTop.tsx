@@ -1,7 +1,13 @@
+/**
+ * Кнопка «Прокрутить наверх» — появляется при скролле вниз
+ * aria-label локализован через useI18n()
+ */
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/hooks/useI18n";
 
 export const ScrollToTop = () => {
+  const { t } = useI18n();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -45,7 +51,7 @@ export const ScrollToTop = () => {
       className={`fixed bottom-6 right-6 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:bg-primary/90 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       }`}
-      aria-label="Прокрутить наверх"
+      aria-label={t("scrollToTop.ariaLabel")}
     >
       <ArrowUp className="w-5 h-5" />
     </button>

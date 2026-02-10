@@ -1,6 +1,7 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Check, Diamond } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useI18n } from "@/hooks/useI18n";
 
 import type { ServiceDetailData } from "./serviceDetails";
 
@@ -11,7 +12,55 @@ interface ServiceDetailModalProps {
 }
 
 export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModalProps) => {
+  const { t, language } = useI18n();
   if (!data) return null;
+
+  // Helper function to translate service detail data
+  const translateServiceData = (serviceKey: string, field: string, defaultValue: string): string => {
+    const translationKey = `serviceDetails.${serviceKey}.${field}`;
+    const translated = t(translationKey);
+    // If translation key is returned (meaning no translation found), return original
+    return translated === translationKey ? defaultValue : translated;
+  };
+
+  // Get service key from data title (reverse lookup)
+  const getServiceKey = (): string => {
+    const titleMap: Record<string, string> = {
+      '"БАЗОВЫЙ"': "БАЗОВЫЙ ФОРМАТ",
+      '"СОПРОВОЖДЕНИЕ С КУРАТОРОМ"': "СОПРОВОЖДЕНИЕ С КУРАТОРОМ",
+      '"ПРЕМИУМ"': "ПРЕМИУМ",
+      '"МИНИ-ГРУППА"': "МИНИ-ГРУППА",
+      '"СТАРТ"': "СТАРТ",
+      '"ТРАНСФОРМАЦИЯ"': "ТРАНСФОРМАЦИЯ",
+    };
+    return titleMap[data.title] || "";
+  };
+
+  const serviceKey = getServiceKey();
+  
+  // Translate data if we have a service key and language is not Russian
+  const translatedData = serviceKey && language !== "ru" ? {
+    ...data,
+    title: translateServiceData(serviceKey, "title", data.title),
+    subtitle: translateServiceData(serviceKey, "subtitle", data.subtitle),
+    description: data.description ? translateServiceData(serviceKey, "description", data.description) : undefined,
+    sections: data.sections.map((section, sectionIdx) => ({
+      ...section,
+      title: translateServiceData(serviceKey, `sections.${sectionIdx}.title`, section.title),
+      items: section.items.map((item, itemIdx) => 
+        translateServiceData(serviceKey, `sections.${sectionIdx}.items.${itemIdx}`, item)
+      ),
+    })),
+    pricing: {
+      label: translateServiceData(serviceKey, "pricing.label", data.pricing.label),
+      options: data.pricing.options.map((option, optionIdx) =>
+        translateServiceData(serviceKey, `pricing.options.${optionIdx}`, option)
+      ),
+    },
+    extras: data.extras?.map((extra, extraIdx) =>
+      translateServiceData(serviceKey, `extras.${extraIdx}`, extra)
+    ),
+  } : data;
 
   return (
     <Dialog
@@ -20,23 +69,25 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden bg-card border-border/50 duration-500 ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-top-1/2 data-[state=open]:slide-in-from-top-1/2">
+      <DialogContent className="p-0 overflow-hidden sm:max-w-2xl">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/30">
           <DialogTitle className="text-2xl md:text-3xl font-bold gradient-text">
-            {data.title}
+            {translatedData.title}
           </DialogTitle>
-          <p className="text-muted-foreground">{data.subtitle}</p>
+          <DialogDescription className="text-muted-foreground">
+            {translatedData.subtitle}
+          </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh] px-6 py-4">
-          {data.description && (
+        <ScrollArea className="h-[calc(100vh-200px)] sm:h-auto sm:max-h-[60vh] px-6 py-4">
+          {translatedData.description && (
             <p className="text-foreground/80 italic mb-6 text-sm leading-relaxed">
-              {data.description}
+              {translatedData.description}
             </p>
           )}
 
           <div className="space-y-6">
-            {data.sections.map((section, idx) => (
+            {translatedData.sections.map((section, idx) => (
               <div key={idx} className="space-y-3">
                 <h4 className="font-semibold text-primary flex items-center gap-2">
                   <Diamond className="w-4 h-4" />
@@ -55,9 +106,9 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
           </div>
 
           <div className="mt-8 pt-6 border-t border-border/30">
-            <h4 className="font-semibold text-foreground mb-3">{data.pricing.label}</h4>
+            <h4 className="font-semibold text-foreground mb-3">{translatedData.pricing.label}</h4>
             <ul className="space-y-2">
-              {data.pricing.options.map((option, idx) => (
+              {translatedData.pricing.options.map((option, idx) => (
                 <li key={idx} className="text-primary text-sm font-medium flex items-start gap-2">
                   <Diamond className="w-3 h-3 mt-1 flex-shrink-0" />
                   {option}
@@ -66,11 +117,11 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
             </ul>
           </div>
 
-          {data.extras && data.extras.length > 0 && (
+          {translatedData.extras && translatedData.extras.length > 0 && (
             <div className="mt-6 pt-4 border-t border-border/30">
-              <h4 className="font-semibold text-foreground mb-3">Дополнительные услуги:</h4>
+              <h4 className="font-semibold text-foreground mb-3">{t("serviceDetail.extras")}</h4>
               <ul className="space-y-1">
-                {data.extras.map((extra, idx) => (
+                {translatedData.extras.map((extra, idx) => (
                   <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                     <Diamond className="w-3 h-3 mt-1 flex-shrink-0 text-primary" />
                     {extra}

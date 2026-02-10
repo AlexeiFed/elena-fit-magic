@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Пропускаем API-запросы — PHP обрабатывает их напрямую (не через SPA)
+  RewriteRule ^api/ - [L]
+
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# SEC-006: HTTP Security Headers
+<IfModule mod_headers.c>
+  # Защита от clickjacking — запрет встраивания сайта в iframe
+  Header set X-Frame-Options "DENY"
+
+  # Защита от MIME-sniffing
+  Header set X-Content-Type-Options "nosniff"
+
+  # Принудительный HTTPS (HSTS) — 1 год
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Политика реферера — отправлять origin только при переходе на другой домен
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Ограничение доступа к API устройств
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+  # Content Security Policy — разрешаем только доверенные источники
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.telegram.org"
+
+  # Защита от XSS (legacy, для старых браузеров)
+  Header set X-XSS-Protection "1; mode=block"
+</IfModule>
