@@ -61,6 +61,8 @@ export interface Service {
   features: ServiceFeature[];
   details?: Record<string, unknown>;
   order: number;
+  /** Не показывать карточку на сайте (только админка) */
+  hidden?: boolean;
 }
 
 /** Категория услуг */

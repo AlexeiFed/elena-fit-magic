@@ -17,6 +17,8 @@ import {
   Pencil,
   X,
   Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useServices, QUERY_KEYS } from "@/hooks/useSiteData";
 import { saveServices } from "@/lib/api";
@@ -51,6 +53,7 @@ interface ServiceItem {
   features: string[];
   details?: ServiceDetails;
   order: number;
+  hidden?: boolean;
 }
 
 interface ServiceCategory {
@@ -157,6 +160,7 @@ export const ServicesEditor = () => {
       subtitle: "",
       features: [],
       order: maxOrder + 1,
+      hidden: false,
     };
     updateCategory(catId, { services: [...cat.services, newSvc] });
     /* Развернуть новую услугу */
@@ -507,7 +511,13 @@ export const ServicesEditor = () => {
           {expandedCategories.has(cat.id) && (
             <div className="p-4 space-y-3">
               {[...cat.services].sort((a, b) => a.order - b.order).map((svc, svcIdx) => (
-                <div key={svc.id} className="rounded-lg border border-border/30 bg-background/50 overflow-hidden">
+                <div
+                  key={svc.id}
+                  className={cn(
+                    "rounded-lg border border-border/30 bg-background/50 overflow-hidden transition-opacity",
+                    svc.hidden && "opacity-60",
+                  )}
+                >
                   {/* Заголовок услуги */}
                   <div
                     className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors"
@@ -519,6 +529,11 @@ export const ServicesEditor = () => {
                       <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                     )}
                     <span className="text-sm font-medium flex-1">{svc.title || "Без названия"}</span>
+                    {svc.hidden && (
+                      <span className="text-xs text-muted-foreground border border-border/40 px-2 py-0.5 rounded-full shrink-0">
+                        Скрыта на сайте
+                      </span>
+                    )}
                     {localData.featuredId === svc.id && (
                       <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         <Star className="w-3 h-3 inline -mt-0.5 mr-0.5" />Популярное
@@ -542,9 +557,25 @@ export const ServicesEditor = () => {
                       <GripVertical className="w-3.5 h-3.5" />
                     </button>
                     <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateService(cat.id, svc.id, { hidden: !svc.hidden });
+                      }}
+                      className={cn(
+                        "p-1 transition-colors shrink-0",
+                        svc.hidden
+                          ? "text-muted-foreground hover:text-foreground"
+                          : "text-primary/80 hover:text-primary",
+                      )}
+                      title={svc.hidden ? "Показать на сайте" : "Скрыть на сайте"}
+                    >
+                      {svc.hidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
                       onClick={(e) => { e.stopPropagation(); removeService(cat.id, svc.id); }}
                       className="p-1 text-destructive/60 hover:text-destructive transition-colors"
-                      title="Удалить"
+                      title="Удалить навсегда"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

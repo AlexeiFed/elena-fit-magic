@@ -3,9 +3,12 @@
  * Featured card для Премиум (gradient border, badge),
  * категории Training и Nutrition с divider,
  * staggered entrance анимации.
+ * Скрытые в админке услуги (services.json → hidden) не рендерятся.
  */
+import { useMemo } from "react";
 import { ServiceCard } from "./ServiceCard";
 import { useI18n } from "@/hooks/useI18n";
+import { useServices } from "@/hooks/useSiteData";
 import { motion } from "framer-motion";
 import { Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
@@ -13,8 +16,32 @@ import { DESIGN_TOKENS } from "@/lib/design-tokens";
 /** ID Премиум-карточки для featured-режима */
 const FEATURED_ID = "ПРЕМИУМ";
 
+const TRAINING_SERVICE_IDS = new Set([
+  "ПРЕМИУМ",
+  "БАЗОВЫЙ ФОРМАТ",
+  "МИНИ-ГРУППА",
+  "СОПРОВОЖДЕНИЕ С КУРАТОРОМ",
+]);
+const NUTRITION_SERVICE_IDS = new Set(["СТАРТ", "ТРАНСФОРМАЦИЯ"]);
+
 export const Services = () => {
   const { t } = useI18n();
+  const { data: servicesFromApi } = useServices();
+
+  const hiddenIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const cat of servicesFromApi?.categories ?? []) {
+      for (const svc of cat.services) {
+        if (svc.hidden) ids.add(svc.id);
+      }
+    }
+    return ids;
+  }, [servicesFromApi]);
+
+  const featuredServiceId =
+    servicesFromApi?.featuredId != null && String(servicesFromApi.featuredId).length > 0
+      ? servicesFromApi.featuredId
+      : FEATURED_ID;
 
   const services = [
     {
@@ -93,8 +120,12 @@ export const Services = () => {
     },
   ];
 
-  const trainingServices = services.slice(0, 4);
-  const nutritionServices = services.slice(4, 6);
+  const trainingServices = services.filter(
+    (s) => TRAINING_SERVICE_IDS.has(s.id) && !hiddenIds.has(s.id),
+  );
+  const nutritionServices = services.filter(
+    (s) => NUTRITION_SERVICE_IDS.has(s.id) && !hiddenIds.has(s.id),
+  );
 
   return (
     <section id="services" className={`${DESIGN_TOKENS.section.default} relative`}>
@@ -138,7 +169,7 @@ export const Services = () => {
                 {...service}
                 index={index}
                 totalCards={trainingServices.length}
-                featured={service.id === FEATURED_ID}
+                featured={service.id === featuredServiceId}
               />
             ))}
           </motion.div>
