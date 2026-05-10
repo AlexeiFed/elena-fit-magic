@@ -3,7 +3,8 @@
  * Featured card для Премиум (gradient border, badge),
  * категории Training и Nutrition с divider,
  * staggered entrance анимации.
- * Скрытые в админке услуги (services.json → hidden) не рендерятся.
+ * Скрытые в админке услуги (services.json → hidden) не рендерятся;
+ * заголовок и разделитель категории показываются только если есть хотя бы одна видимая карточка.
  */
 import { useMemo } from "react";
 import { ServiceCard } from "./ServiceCard";
@@ -145,64 +146,68 @@ export const Services = () => {
           </Reveal>
         </div>
 
-        {/* === Категория: Тренировки === */}
-        <div className="mb-20">
-          <div className="flex items-center gap-4 mb-10">
-            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-            <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
-              {t("services.category.training")}
-            </h3>
-            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-          </div>
+        {/* === Категория: Тренировки === (целиком скрываем, если нет видимых карточек) */}
+        {trainingServices.length > 0 && (
+          <div className="mb-20">
+            <div className="flex items-center gap-4 mb-10">
+              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+              <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
+                {t("services.category.training")}
+              </h3>
+              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+            </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-            style={{ gridAutoRows: "1fr" }}
-          >
-            {trainingServices.map((service, index) => (
-              <ServiceCard
-                key={service.id}
-                {...service}
-                index={index}
-                totalCards={trainingServices.length}
-                featured={service.id === featuredServiceId}
-              />
-            ))}
-          </motion.div>
-        </div>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+              style={{ gridAutoRows: "1fr" }}
+            >
+              {trainingServices.map((service, index) => (
+                <ServiceCard
+                  key={service.id}
+                  {...service}
+                  index={index}
+                  totalCards={trainingServices.length}
+                  featured={service.id === featuredServiceId}
+                />
+              ))}
+            </motion.div>
+          </div>
+        )}
 
         {/* === Категория: Нутрициология === */}
-        <div>
-          <div className="flex items-center gap-4 mb-10">
-            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-            <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
-              {t("services.category.nutrition")}
-            </h3>
-            <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-          </div>
+        {nutritionServices.length > 0 && (
+          <div className={trainingServices.length > 0 ? "" : "mb-20"}>
+            <div className="flex items-center gap-4 mb-10">
+              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+              <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
+                {t("services.category.nutrition")}
+              </h3>
+              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
+            </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
-            style={{ gridAutoRows: "1fr" }}
-          >
-            {nutritionServices.map((service, index) => (
-              <ServiceCard
-                key={service.id}
-                {...service}
-                index={index}
-                totalCards={nutritionServices.length}
-              />
-            ))}
-          </motion.div>
-        </div>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
+              style={{ gridAutoRows: "1fr" }}
+            >
+              {nutritionServices.map((service, index) => (
+                <ServiceCard
+                  key={service.id}
+                  {...service}
+                  index={index}
+                  totalCards={nutritionServices.length}
+                />
+              ))}
+            </motion.div>
+          </div>
+        )}
       </div>
     </section>
   );
