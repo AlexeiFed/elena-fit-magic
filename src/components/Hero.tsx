@@ -6,11 +6,12 @@
  * glass stats card с social proof, floating shapes, scroll indicator.
  */
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Users, Award, TrendingUp } from "lucide-react";
+import { ArrowDown, Users, Award, TrendingUp } from "@/components/icons";
 import elenaHeroWebp from "@/assets/elena-hero.webp";
 import elenaHeroJpg from "@/assets/elena-hero.jpg";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { useI18n } from "@/hooks/useI18n";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
 // Вычисление лет опыта (начало — 13 февраля 2014)
@@ -23,6 +24,7 @@ const getYearsOfExperience = (): number => {
 
 export const Hero = () => {
   const { t } = useI18n();
+  const { hero: heroCms } = useResolvedSiteContent();
   const yearsOfExperience = getYearsOfExperience();
 
   const scrollToServices = () => {
@@ -30,7 +32,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-24 lg:pt-0">
+    <section className={`relative min-h-screen flex items-center overflow-hidden ${DESIGN_TOKENS.heroSectionPaddingTop}`}>
       {/* === Animated gradient mesh background === */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-primary/8 rounded-full blur-[100px] animate-gradient-mesh-1" />
@@ -57,13 +59,13 @@ export const Hero = () => {
           <div className="flex flex-col justify-center py-12 lg:py-0 order-2 lg:order-1">
             {/* Headline */}
             <h1 className={`${DESIGN_TOKENS.heading.h1} mb-6 text-center lg:text-left hero-animate-1`}>
-              {t("hero.title")} <br />
-              <span className="gradient-text">{t("hero.titleHighlight")}</span>
+              {heroCms.title} <br />
+              <span className="gradient-text">{heroCms.titleHighlight}</span>
             </h1>
 
             {/* Subtitle */}
             <p className={`${DESIGN_TOKENS.text.large} mb-10 max-w-xl text-center lg:text-left mx-auto lg:mx-0 hero-animate-2`}>
-              {t("hero.subtitle")}
+              {heroCms.subtitle}
             </p>
 
             {/* CTA Button with shimmer */}
@@ -73,7 +75,7 @@ export const Hero = () => {
                 size="lg"
                 className="btn-shimmer rounded-full bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-7 text-lg shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
               >
-                {t("hero.cta")}
+                {heroCms.cta}
                 <ArrowDown className="ml-3 w-5 h-5 group-hover:translate-y-1 transition-transform" />
               </Button>
             </div>
@@ -87,8 +89,8 @@ export const Hero = () => {
                     <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="text-lg sm:text-2xl font-bold gradient-text leading-none">300+</div>
-                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t("cta.stats.clients")}</div>
+                    <div className="text-lg sm:text-2xl font-bold gradient-text leading-none">{heroCms.statsClients}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{heroCms.statsClientsLabel}</div>
                   </div>
                 </div>
                 {/* Stat: Experience */}
@@ -98,7 +100,7 @@ export const Hero = () => {
                   </div>
                   <div>
                     <div className="text-lg sm:text-2xl font-bold gradient-text leading-none">{yearsOfExperience}{t("cta.stats.years")}</div>
-                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t("cta.stats.experience")}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{heroCms.statsExperienceLabel}</div>
                   </div>
                 </div>
                 {/* Stat: Success rate */}
@@ -107,8 +109,8 @@ export const Hero = () => {
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="text-lg sm:text-2xl font-bold gradient-text leading-none">98%</div>
-                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t("cta.stats.success")}</div>
+                    <div className="text-lg sm:text-2xl font-bold gradient-text leading-none">{heroCms.statsSuccessRate}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{heroCms.statsSuccessLabel}</div>
                   </div>
                 </div>
               </div>
@@ -126,7 +128,7 @@ export const Hero = () => {
                 <OptimizedImage
                   webpSrc={elenaHeroWebp}
                   fallbackSrc={elenaHeroJpg}
-                  alt={t("hero.title")}
+                  alt={heroCms.title}
                   width={1024}
                   height={1280}
                   loading="eager"

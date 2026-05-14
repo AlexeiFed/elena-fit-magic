@@ -9,18 +9,7 @@
  */
 import { useState, useEffect } from "react";
 import {
-  Plus,
-  Trash2,
-  Save,
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  X,
-  Loader2,
-  Check,
-  ToggleLeft,
-  ToggleRight,
-} from "lucide-react";
+  Plus, Trash2, Save, ChevronUp, ChevronDown, Pencil, X, Loader2, Check, ToggleLeft, ToggleRight } from "@/components/icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTestimonials, QUERY_KEYS } from "@/hooks/useSiteData";
 import { saveTestimonials } from "@/lib/api";

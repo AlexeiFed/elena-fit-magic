@@ -41,9 +41,11 @@ function sitemapPlugin(): Plugin {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: "/",
+  // "::" на части macOS/Safari даёт ощущение «висит» на 127.0.0.1 — слушаем все интерфейсы явно через Vite.
   server: {
-    host: "::",
+    host: true,
     port: 8080,
+    strictPort: true,
   },
   plugins: [
     react(),
@@ -56,23 +58,22 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    // Иначе Rollup гоняет gzip по всем чанкам в конце — на большом графе выглядит как «зависло»
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
-        // PERF: разбиваем vendor бандл на отдельные чанки для параллельной загрузки и кеширования
-        manualChunks: {
-          "vendor-react": ["react", "react-dom"],
-          "vendor-router": ["react-router-dom"],
-          "vendor-motion": ["framer-motion"],
-          "vendor-radix": [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-tooltip",
-            "@radix-ui/react-checkbox",
-            "@radix-ui/react-label",
-            "@radix-ui/react-slot",
-          ],
+        /**
+         * Раньше был объект manualChunks по спискам пакетов — при множестве Radix + общих deps
+         * Rollup долго крутит разбиение (у пользователя «transforming…» минутами).
+         * Делим только крупные изолированные вендоры по id — дешевле и стабильнее.
+         */
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("framer-motion")) return "vendor-motion";
+          if (id.includes("react-router")) return "vendor-router";
+          if (id.includes("@radix-ui")) return "vendor-radix";
+          if (id.includes("/react-dom/") || id.includes("react-dom")) return "vendor-react";
+          if (id.includes("/react/") && id.includes("node_modules/react")) return "vendor-react";
         },
       },
     },

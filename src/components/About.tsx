@@ -4,26 +4,37 @@
  * numbered steps (вместо hover-тултипов), badge регалии.
  * Анимации через Reveal (framer-motion whileInView).
  */
-import { Heart, Sparkles, Target, Zap, Award } from "lucide-react";
+import { Heart, Sparkles, Target, Zap, Award, Apple, Shield, Trophy, Star, Users, type LucideIcon } from "@/components/icons";
 import elenaAboutWebp from "@/assets/elena-about.webp";
 import elenaAboutJpg from "@/assets/elena-about.jpg";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { useI18n } from "@/hooks/useI18n";
-import { motion } from "framer-motion";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
+import { motion } from "@/lib/motion";
 import { Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
+const ABOUT_ICONS: Record<string, LucideIcon> = {
+  Heart,
+  Zap,
+  Apple,
+  Target,
+  Shield,
+  Trophy,
+  Star,
+  Users,
+  Sparkles,
+};
+
 export const About = () => {
-  const { t } = useI18n();
+  const { about: aboutCms } = useResolvedSiteContent();
 
-  const features = [
-    { icon: Heart, text: t("about.feature.health"), description: t("about.feature.healthDesc") },
-    { icon: Zap, text: t("about.feature.energy"), description: t("about.feature.energyDesc") },
-    { icon: Sparkles, text: t("about.feature.nutrition"), description: t("about.feature.nutritionDesc") },
-    { icon: Target, text: t("about.feature.goals"), description: t("about.feature.goalsDesc") },
-  ];
+  const features = aboutCms.features.map((f) => ({
+    icon: ABOUT_ICONS[f.icon] ?? Heart,
+    text: f.title,
+    description: f.description,
+  }));
 
-  const regalia = [t("about.regalia1"), t("about.regalia2")];
+  const regalia = aboutCms.regalia;
 
   return (
     <section id="about" className={`${DESIGN_TOKENS.section.alt} relative overflow-hidden`}>
@@ -32,13 +43,13 @@ export const About = () => {
         <div className="text-center mb-16 md:mb-20">
           <Reveal>
             <h2 className={`${DESIGN_TOKENS.heading.h2}`}>
-              {t("about.title")}{" "}
-              <span className="gradient-text">{t("about.titleHighlight")}</span>
+              {aboutCms.title}{" "}
+              <span className="gradient-text">{aboutCms.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.15}>
             <p className={`${DESIGN_TOKENS.text.large} max-w-2xl mx-auto`}>
-              {t("about.subtitle")}
+              {aboutCms.subtitle}
             </p>
           </Reveal>
         </div>
@@ -53,7 +64,7 @@ export const About = () => {
                   <OptimizedImage
                     webpSrc={elenaAboutWebp}
                     fallbackSrc={elenaAboutJpg}
-                    alt={t("about.titleHighlight")}
+                    alt={aboutCms.titleHighlight}
                     width={720}
                     height={1280}
                     loading="lazy"
@@ -73,7 +84,7 @@ export const About = () => {
           <div className="space-y-10">
             {/* Описание — три абзаца */}
             <div className="space-y-5">
-              {[t("about.description1"), t("about.description2"), t("about.description3")].map((desc, i) => (
+              {aboutCms.descriptions.map((desc, i) => (
                 <Reveal key={i} delay={0.2 + i * 0.1}>
                   <p className={DESIGN_TOKENS.text.muted}>{desc}</p>
                 </Reveal>

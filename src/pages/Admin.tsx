@@ -4,7 +4,7 @@
  * Проверяет авторизацию при загрузке, показывает AdminLogin или AdminLayout.
  */
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@/components/icons";
 import { checkAuth } from "@/lib/api";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminLayout } from "@/components/admin/AdminLayout";

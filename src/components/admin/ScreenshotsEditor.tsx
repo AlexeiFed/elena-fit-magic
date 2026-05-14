@@ -10,18 +10,7 @@
  */
 import { useState, useEffect, useRef } from "react";
 import {
-  Plus,
-  Trash2,
-  Save,
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  X,
-  Loader2,
-  Check,
-  Upload,
-  ImageIcon,
-} from "lucide-react";
+  Plus, Trash2, Save, ChevronUp, ChevronDown, Pencil, X, Loader2, Check, Upload, ImageIcon } from "@/components/icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { useScreenshots, QUERY_KEYS } from "@/hooks/useSiteData";
 import { saveScreenshots, uploadImage, deleteImage } from "@/lib/api";

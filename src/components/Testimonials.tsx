@@ -9,7 +9,7 @@
  * Фон: section.alt (чередование с WhyChoose default).
  */
 import { useState, useCallback, useEffect } from "react";
-import { Quote, Star, MessageCircle, ZoomIn, X } from "lucide-react";
+import { Quote, Star, MessageCircle, ZoomIn, X } from "@/components/icons";
 import { useI18n } from "@/hooks/useI18n";
 import { useTestimonials, useScreenshots } from "@/hooks/useSiteData";
 import { Reveal } from "./animations/Reveal";

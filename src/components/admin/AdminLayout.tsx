@@ -5,14 +5,7 @@
  */
 import { useState } from "react";
 import {
-  LogOut,
-  MessageSquare,
-  Image,
-  ShoppingBag,
-  FileText,
-  Settings,
-  ChevronLeft,
-} from "lucide-react";
+  LogOut, MessageSquare, Image, ShoppingBag, FileText, Settings, ChevronLeft } from "@/components/icons";
 import { adminLogout } from "@/lib/api";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 import { cn } from "@/lib/utils";

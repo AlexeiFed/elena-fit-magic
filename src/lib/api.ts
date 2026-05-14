@@ -47,19 +47,27 @@ export interface LocalizedText {
   en: string;
 }
 
-/** Фича услуги */
-export interface ServiceFeature {
-  ru: string;
-  en: string;
+/** Детали услуги для модалки «Подробнее» (как в services.json / админке) */
+export interface ServiceDetailsPayload {
+  title: string;
+  subtitle: string;
+  description?: string;
+  sections: { title: string; items: string[] }[];
+  pricing: { label: string; options: string[] };
+  extras?: string[];
 }
 
-/** Услуга */
+/** Услуга (плоские строки из админки; EN — опционально) */
 export interface Service {
   id: string;
-  title: LocalizedText;
-  subtitle: LocalizedText;
-  features: ServiceFeature[];
-  details?: Record<string, unknown>;
+  title: string;
+  titleEn?: string;
+  subtitle: string;
+  subtitleEn?: string;
+  features: string[];
+  featuresEn?: string[];
+  details?: ServiceDetailsPayload;
+  detailsEn?: ServiceDetailsPayload;
   order: number;
   /** Не показывать карточку на сайте (только админка) */
   hidden?: boolean;
@@ -68,7 +76,8 @@ export interface Service {
 /** Категория услуг */
 export interface ServiceCategory {
   id: string;
-  title: LocalizedText;
+  title: string;
+  titleEn?: string;
   services: Service[];
 }
 
@@ -78,12 +87,18 @@ export interface ServicesData {
   categories: ServiceCategory[];
 }
 
-/** Данные контента сайта */
+/** Данные контента сайта (+ опциональные блоки для EN) */
 export interface SiteContentData {
   hero?: Record<string, unknown>;
+  heroEn?: Record<string, unknown>;
   about?: Record<string, unknown>;
+  aboutEn?: Record<string, unknown>;
   process?: Record<string, unknown>;
+  processEn?: Record<string, unknown>;
+  services?: Record<string, unknown>;
+  servicesEn?: Record<string, unknown>;
   cta?: Record<string, unknown>;
+  ctaEn?: Record<string, unknown>;
   contacts?: Record<string, unknown>;
   [key: string]: unknown;
 }

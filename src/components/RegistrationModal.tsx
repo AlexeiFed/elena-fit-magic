@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/hooks/useI18n";
 

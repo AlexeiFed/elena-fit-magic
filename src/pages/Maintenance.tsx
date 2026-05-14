@@ -1,4 +1,4 @@
-import { Wrench } from "lucide-react";
+import { Wrench } from "@/components/icons";
 
 const Maintenance = () => (
   <div className="min-h-screen flex items-center justify-center bg-background px-4">

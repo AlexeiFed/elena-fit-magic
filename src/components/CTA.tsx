@@ -4,15 +4,17 @@
  * без статов (перенесены в Hero).
  */
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send } from "@/components/icons";
 import maxLogoWebp from "@/assets/max-logo.webp";
 import maxLogoPng from "@/assets/max-logo.png";
 import { useI18n } from "@/hooks/useI18n";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
 import { Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
 export const CTA = () => {
   const { t } = useI18n();
+  const { cta: ctaCms, contacts } = useResolvedSiteContent();
 
   return (
     <section id="cta" className="relative py-24 md:py-32 overflow-visible">
@@ -38,14 +40,14 @@ export const CTA = () => {
             <div className="w-full max-w-2xl mx-auto text-center">
               <Reveal width="100%" overflow="visible">
                 <h2 className={`${DESIGN_TOKENS.heading.h2} mb-6 text-center`}>
-                  {t("cta.title")} <br />
-                  <span className="gradient-text">{t("cta.titleHighlight")}</span>
+                  {ctaCms.title} <br />
+                  <span className="gradient-text">{ctaCms.titleHighlight}</span>
                 </h2>
               </Reveal>
 
               <Reveal width="100%" overflow="visible" delay={0.1}>
                 <p className={`${DESIGN_TOKENS.text.large} mb-10 text-muted-foreground text-center`}>
-                  {t("cta.subtitle")}
+                  {ctaCms.subtitle}
                 </p>
               </Reveal>
             </div>
@@ -58,7 +60,7 @@ export const CTA = () => {
                   className="btn-shimmer btn-cta-shadow w-full sm:w-56 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 text-lg font-semibold hover:scale-[1.02] active:scale-[0.98] group transition-all duration-300"
                   asChild
                 >
-                  <a href="https://t.me/Elena_fitmentor" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                  <a href={contacts.telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                     <Send className="mr-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     {t("cta.telegram")}
                   </a>
@@ -70,7 +72,7 @@ export const CTA = () => {
                   className="btn-cta-shadow w-full sm:w-56 rounded-full border-2 border-primary/10 hover:border-primary/30 hover:bg-primary/5 text-foreground hover:text-foreground h-14 text-lg group transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] bg-transparent"
                   asChild
                 >
-                  <a href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                  <a href={contacts.maxUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                     <picture className="flex items-center">
                       <source srcSet={maxLogoWebp} type="image/webp" />
                       <img src={maxLogoPng} alt="Max" width={24} height={24} loading="lazy" className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />

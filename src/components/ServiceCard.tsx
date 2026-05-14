@@ -3,14 +3,14 @@
  * Поддерживает featured mode (для Премиум): gradient border,
  * badge «Популярное», увеличенная тень, shimmer CTA.
  */
-import { Check, ChevronRight, Star } from "lucide-react";
+import { Check, ChevronRight, Star } from "@/components/icons";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 import { RegistrationModal } from "./RegistrationModal";
-import { serviceDetails } from "./serviceDetails";
+import { serviceDetails, type ServiceDetailData } from "./serviceDetails";
 import { useI18n } from "@/hooks/useI18n";
-import { motion } from "framer-motion";
+import { motion } from "@/lib/motion";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 import { cn } from "@/lib/utils";
 
@@ -19,17 +19,30 @@ interface ServiceCardProps {
   title: string;
   subtitle: string;
   features: string[];
+  /** Детали модалки из API (если есть — приоритет над статическим serviceDetails.ts) */
+  detailFromApi: ServiceDetailData | null;
   index: number;
   totalCards: number;
   featured?: boolean;
 }
 
-export const ServiceCard = ({ id, title, subtitle, features, index, totalCards, featured = false }: ServiceCardProps) => {
+export const ServiceCard = ({
+  id,
+  title,
+  subtitle,
+  features,
+  detailFromApi,
+  index,
+  totalCards,
+  featured = false,
+}: ServiceCardProps) => {
   const { t } = useI18n();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
-  const detailData = serviceDetails[id] || null;
+  const legacyDetail = serviceDetails[id] || null;
+  const detailData = detailFromApi ?? legacyDetail;
+  const modalSource: "cms" | "legacy" = detailFromApi ? "cms" : "legacy";
 
   return (
     <motion.div
@@ -134,6 +147,7 @@ export const ServiceCard = ({ id, title, subtitle, features, index, totalCards, 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         data={detailData}
+        contentSource={modalSource}
       />
 
       <RegistrationModal

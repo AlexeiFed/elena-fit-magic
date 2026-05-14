@@ -7,8 +7,9 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, Send } from "lucide-react";
+import { Globe, Menu, Send } from "@/components/icons";
 import { useI18n } from "@/hooks/useI18n";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
 import {
   Sheet,
   SheetContent,
@@ -35,6 +36,7 @@ const NAV_LINKS = [
 
 export const Navbar = () => {
   const { t, language, setLanguage } = useI18n();
+  const { contacts } = useResolvedSiteContent();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -156,7 +158,7 @@ export const Navbar = () => {
               asChild
             >
               <a
-                href="https://t.me/Elena_fitmentor"
+                href={contacts.telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -241,7 +243,7 @@ export const Navbar = () => {
                     asChild
                   >
                     <a
-                      href="https://t.me/Elena_fitmentor"
+                      href={contacts.telegramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

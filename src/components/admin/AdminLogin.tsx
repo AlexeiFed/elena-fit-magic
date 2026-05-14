@@ -4,7 +4,7 @@
  * При успешном входе вызывает onLogin callback.
  */
 import { useState } from "react";
-import { Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Lock, Eye, EyeOff, Loader2 } from "@/components/icons";
 import { adminLogin } from "@/lib/api";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 

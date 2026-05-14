@@ -1,31 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/hooks/useI18n";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "@/lib/motion";
 import { TextReveal, Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 import {
-  Users,
-  Target,
-  Calendar,
-  Zap,
-  BookOpen,
-  Shield,
-  Heart,
-  Brain,
-  TrendingUp,
-  CheckCircle2,
-  Sparkles,
-  Clock,
-  Activity,
-  Award,
-  Lightbulb,
-  BarChart3,
-  Handshake,
-  Microscope,
-  RefreshCw,
-  UserCheck
-} from "lucide-react";
+  Users, Target, Calendar, Zap, BookOpen, Shield, Heart, Brain, TrendingUp, CheckCircle2, Sparkles, Clock, Activity, Award, Lightbulb, BarChart3, Handshake, Microscope, RefreshCw, UserCheck } from "@/components/icons";
 
 interface PackageInfo {
   id: string;

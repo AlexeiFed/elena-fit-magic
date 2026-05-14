@@ -5,8 +5,8 @@
  * Иконки + краткий текст, staggered Reveal анимации.
  * Фон: section.default (чередование с About section.alt).
  */
-import { Send, Stethoscope, ClipboardList, Trophy } from "lucide-react";
-import { useI18n } from "@/hooks/useI18n";
+import { Send, Stethoscope, ClipboardList, Trophy } from "@/components/icons";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
 import { Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
@@ -19,7 +19,7 @@ const STEPS = [
 ] as const;
 
 export const Process = () => {
-  const { t } = useI18n();
+  const { process: proc } = useResolvedSiteContent();
 
   return (
     <section id="process" className={`${DESIGN_TOKENS.section.default} relative overflow-hidden`}>
@@ -28,13 +28,13 @@ export const Process = () => {
         <div className="text-center mb-16 md:mb-20">
           <Reveal>
             <h2 className={DESIGN_TOKENS.heading.h2}>
-              {t("process.title")}{" "}
-              <span className="gradient-text">{t("process.titleHighlight")}</span>
+              {proc.title}{" "}
+              <span className="gradient-text">{proc.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.15}>
             <p className={`${DESIGN_TOKENS.text.muted} max-w-2xl mx-auto`}>
-              {t("process.subtitle")}
+              {proc.subtitle}
             </p>
           </Reveal>
         </div>
@@ -53,8 +53,10 @@ export const Process = () => {
 
           {/* === Шаги === */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-6">
-            {STEPS.map((step, index) => (
-              <Reveal key={step.key} delay={0.2 + index * 0.12}>
+            {STEPS.map((step, index) => {
+              const stepData = proc.steps[index];
+              return (
+                <Reveal key={step.key} delay={0.2 + index * 0.12}>
                 <div className="relative flex lg:flex-col items-start lg:items-center gap-5 lg:gap-4 group">
                   {/* Номер шага + иконка */}
                   <div className="relative z-10 flex-shrink-0">
@@ -73,15 +75,16 @@ export const Process = () => {
                   {/* Текстовый блок */}
                   <div className="lg:text-center">
                     <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
-                      {t(`${step.key}.title`)}
+                      {stepData?.title ?? ""}
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {t(`${step.key}.description`)}
+                      {stepData?.description ?? ""}
                     </p>
                   </div>
                 </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </div>

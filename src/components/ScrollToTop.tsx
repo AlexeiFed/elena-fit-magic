@@ -2,7 +2,7 @@
  * Кнопка «Прокрутить наверх» — появляется при скролле вниз
  * aria-label локализован через useI18n()
  */
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@/components/icons";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/hooks/useI18n";
 

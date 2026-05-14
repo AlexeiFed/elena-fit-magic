@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Check, Diamond } from "lucide-react";
+import { Check, Diamond } from "@/components/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useI18n } from "@/hooks/useI18n";
 
@@ -9,9 +9,16 @@ interface ServiceDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   data: ServiceDetailData | null;
+  /** cms — текст уже языковой из API; legacy — i18n serviceDetails для EN */
+  contentSource?: "cms" | "legacy";
 }
 
-export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModalProps) => {
+export const ServiceDetailModal = ({
+  isOpen,
+  onClose,
+  data,
+  contentSource = "legacy",
+}: ServiceDetailModalProps) => {
   const { t, language } = useI18n();
   if (!data) return null;
 
@@ -37,30 +44,36 @@ export const ServiceDetailModal = ({ isOpen, onClose, data }: ServiceDetailModal
   };
 
   const serviceKey = getServiceKey();
-  
-  // Translate data if we have a service key and language is not Russian
-  const translatedData = serviceKey && language !== "ru" ? {
-    ...data,
-    title: translateServiceData(serviceKey, "title", data.title),
-    subtitle: translateServiceData(serviceKey, "subtitle", data.subtitle),
-    description: data.description ? translateServiceData(serviceKey, "description", data.description) : undefined,
-    sections: data.sections.map((section, sectionIdx) => ({
-      ...section,
-      title: translateServiceData(serviceKey, `sections.${sectionIdx}.title`, section.title),
-      items: section.items.map((item, itemIdx) => 
-        translateServiceData(serviceKey, `sections.${sectionIdx}.items.${itemIdx}`, item)
-      ),
-    })),
-    pricing: {
-      label: translateServiceData(serviceKey, "pricing.label", data.pricing.label),
-      options: data.pricing.options.map((option, optionIdx) =>
-        translateServiceData(serviceKey, `pricing.options.${optionIdx}`, option)
-      ),
-    },
-    extras: data.extras?.map((extra, extraIdx) =>
-      translateServiceData(serviceKey, `extras.${extraIdx}`, extra)
-    ),
-  } : data;
+
+  const translatedData =
+    contentSource === "cms"
+      ? data
+      : serviceKey && language !== "ru"
+        ? {
+            ...data,
+            title: translateServiceData(serviceKey, "title", data.title),
+            subtitle: translateServiceData(serviceKey, "subtitle", data.subtitle),
+            description: data.description
+              ? translateServiceData(serviceKey, "description", data.description)
+              : undefined,
+            sections: data.sections.map((section, sectionIdx) => ({
+              ...section,
+              title: translateServiceData(serviceKey, `sections.${sectionIdx}.title`, section.title),
+              items: section.items.map((item, itemIdx) =>
+                translateServiceData(serviceKey, `sections.${sectionIdx}.items.${itemIdx}`, item),
+              ),
+            })),
+            pricing: {
+              label: translateServiceData(serviceKey, "pricing.label", data.pricing.label),
+              options: data.pricing.options.map((option, optionIdx) =>
+                translateServiceData(serviceKey, `pricing.options.${optionIdx}`, option),
+              ),
+            },
+            extras: data.extras?.map((extra, extraIdx) =>
+              translateServiceData(serviceKey, `extras.${extraIdx}`, extra),
+            ),
+          }
+        : data;
 
   return (
     <Dialog

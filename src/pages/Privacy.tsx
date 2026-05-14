@@ -5,7 +5,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "@/components/icons";
 import { useI18n } from "@/hooks/useI18n";
 
 const Privacy = () => {

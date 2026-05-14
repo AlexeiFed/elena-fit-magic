@@ -1,21 +1,20 @@
 /**
  * Services — секция услуг
- * Featured card для Премиум (gradient border, badge),
- * категории Training и Nutrition с divider,
- * staggered entrance анимации.
- * Скрытые в админке услуги (services.json → hidden) не рендерятся;
- * заголовок и разделитель категории показываются только если есть хотя бы одна видимая карточка.
+ * Карточки и модалка из services.json (API); заголовки секции — site-content + i18n;
+ * подписи категорий «Тренировки» / «Нутрициология» из категорий в JSON (title / titleEn).
  */
 import { useMemo } from "react";
 import { ServiceCard } from "./ServiceCard";
 import { useI18n } from "@/hooks/useI18n";
 import { useServices } from "@/hooks/useSiteData";
-import { motion } from "framer-motion";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
+import { motion } from "@/lib/motion";
 import { Reveal } from "./animations/Reveal";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
+import { resolveServiceForCard } from "@/lib/service-resolve";
+import type { ServiceCategory } from "@/lib/api";
 
-/** ID Премиум-карточки для featured-режима */
-const FEATURED_ID = "ПРЕМИУМ";
+const FEATURED_ID_FALLBACK = "ПРЕМИУМ";
 
 const TRAINING_SERVICE_IDS = new Set([
   "ПРЕМИУМ",
@@ -25,134 +24,100 @@ const TRAINING_SERVICE_IDS = new Set([
 ]);
 const NUTRITION_SERVICE_IDS = new Set(["СТАРТ", "ТРАНСФОРМАЦИЯ"]);
 
-export const Services = () => {
-  const { t } = useI18n();
-  const { data: servicesFromApi } = useServices();
+const FALLBACK_CATEGORIES: ServiceCategory[] = [
+  {
+    id: "training",
+    title: "",
+    services: [...TRAINING_SERVICE_IDS].map((id, order) => ({
+      id,
+      title: "",
+      subtitle: "",
+      features: [],
+      order,
+    })),
+  },
+  {
+    id: "nutrition",
+    title: "",
+    services: [...NUTRITION_SERVICE_IDS].map((id, order) => ({
+      id,
+      title: "",
+      subtitle: "",
+      features: [],
+      order,
+    })),
+  },
+];
 
-  const hiddenIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const cat of servicesFromApi?.categories ?? []) {
-      for (const svc of cat.services) {
-        if (svc.hidden) ids.add(svc.id);
-      }
-    }
-    return ids;
-  }, [servicesFromApi]);
+export const Services = () => {
+  const { t, language } = useI18n();
+  const { data: servicesFromApi } = useServices();
+  const { servicesSection } = useResolvedSiteContent();
 
   const featuredServiceId =
     servicesFromApi?.featuredId != null && String(servicesFromApi.featuredId).length > 0
       ? servicesFromApi.featuredId
-      : FEATURED_ID;
+      : FEATURED_ID_FALLBACK;
 
-  const services = [
-    {
-      id: "ПРЕМИУМ",
-      title: t("services.premium.title"),
-      subtitle: t("services.premium.subtitle"),
-      features: [
-        t("services.premium.feature1"),
-        t("services.premium.feature2"),
-        t("services.premium.feature3"),
-        t("services.premium.feature4"),
-        t("services.premium.feature5"),
-        t("services.premium.feature6"),
-      ],
-    },
-    {
-      id: "БАЗОВЫЙ ФОРМАТ",
-      title: t("services.basic.title"),
-      subtitle: t("services.basic.subtitle"),
-      features: [
-        t("services.basic.feature1"),
-        t("services.basic.feature2"),
-        t("services.basic.feature3"),
-        t("services.basic.feature4"),
-        t("services.basic.feature5"),
-      ],
-    },
-    {
-      id: "МИНИ-ГРУППА",
-      title: t("services.miniGroup.title"),
-      subtitle: t("services.miniGroup.subtitle"),
-      features: [
-        t("services.miniGroup.feature1"),
-        t("services.miniGroup.feature2"),
-        t("services.miniGroup.feature3"),
-        t("services.miniGroup.feature4"),
-        t("services.miniGroup.feature5"),
-        t("services.miniGroup.feature6"),
-      ],
-    },
-    {
-      id: "СОПРОВОЖДЕНИЕ С КУРАТОРОМ",
-      title: t("services.curator.title"),
-      subtitle: t("services.curator.subtitle"),
-      features: [
-        t("services.curator.feature1"),
-        t("services.curator.feature2"),
-        t("services.curator.feature3"),
-        t("services.curator.feature4"),
-        t("services.curator.feature5"),
-      ],
-    },
-    {
-      id: "СТАРТ",
-      title: t("services.start.title"),
-      subtitle: t("services.start.subtitle"),
-      features: [
-        t("services.start.feature1"),
-        t("services.start.feature2"),
-        t("services.start.feature3"),
-        t("services.start.feature4"),
-        t("services.start.feature5"),
-      ],
-    },
-    {
-      id: "ТРАНСФОРМАЦИЯ",
-      title: t("services.transformation.title"),
-      subtitle: t("services.transformation.subtitle"),
-      features: [
-        t("services.transformation.feature1"),
-        t("services.transformation.feature2"),
-        t("services.transformation.feature3"),
-        t("services.transformation.feature4"),
-        t("services.transformation.feature5"),
-      ],
-    },
-  ];
+  const serviceCategories = useMemo(() => {
+    const sourceCategories =
+      servicesFromApi?.categories?.length ? servicesFromApi.categories : FALLBACK_CATEGORIES;
 
-  const trainingServices = services.filter(
-    (s) => TRAINING_SERVICE_IDS.has(s.id) && !hiddenIds.has(s.id),
-  );
-  const nutritionServices = services.filter(
-    (s) => NUTRITION_SERVICE_IDS.has(s.id) && !hiddenIds.has(s.id),
-  );
+    const fallbackCategoryLabel = (cat: ServiceCategory) => {
+      if (cat.id === "training" || cat.services?.some((s) => TRAINING_SERVICE_IDS.has(s.id))) {
+        return t("services.category.training");
+      }
+      if (cat.id === "nutrition" || cat.services?.some((s) => NUTRITION_SERVICE_IDS.has(s.id))) {
+        return t("services.category.nutrition");
+      }
+      return t("services.title");
+    };
+
+    const pickCategoryLabel = (cat: ServiceCategory) => {
+      if (language === "en") return cat.titleEn?.trim() || fallbackCategoryLabel(cat);
+      return cat.title?.trim() || fallbackCategoryLabel(cat);
+    };
+
+    return sourceCategories
+      .map((cat) => {
+        const services = [...(cat.services ?? [])]
+          .filter((svc) => !svc.hidden)
+          .sort((a, b) => a.order - b.order)
+          .map((svc) => resolveServiceForCard(svc.id, language, t, svc));
+
+        return {
+          id: cat.id,
+          label: pickCategoryLabel(cat),
+          services,
+        };
+      })
+      .filter((cat) => cat.services.length > 0);
+  }, [servicesFromApi, language, t]);
 
   return (
     <section id="services" className={`${DESIGN_TOKENS.section.default} relative`}>
       <div className={DESIGN_TOKENS.container}>
-        {/* Заголовок секции */}
         <div className="text-center mb-16 md:mb-20">
           <Reveal>
             <h2 className={DESIGN_TOKENS.heading.h2}>
-              {t("services.title")}{" "}
-              <span className="gradient-text">{t("services.titleHighlight")}</span>
+              {servicesSection.title}{" "}
+              <span className="gradient-text">{servicesSection.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.15}>
-            <p className={`${DESIGN_TOKENS.text.muted} max-w-2xl mx-auto`}>
-              {t("services.subtitle")}
-            </p>
+            <p className={`${DESIGN_TOKENS.text.muted} max-w-2xl mx-auto`}>{servicesSection.subtitle}</p>
           </Reveal>
         </div>
 
-        {/* === Категория: Тренировки === (целиком скрываем, если нет видимых карточек) */}
-        {trainingServices.length > 0 && (
-          <div className="mb-20">
+        {serviceCategories.map((category, categoryIndex) => (
+          <div
+            key={category.id}
+            className={categoryIndex < serviceCategories.length - 1 ? "mb-20" : ""}
+          >
             <div className="flex items-center gap-4 mb-10">
               <div className={DESIGN_TOKENS.divider + " flex-grow"} />
               <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
-                {t("services.category.training")}
+                {category.label}
               </h3>
               <div className={DESIGN_TOKENS.divider + " flex-grow"} />
             </div>
@@ -165,49 +130,22 @@ export const Services = () => {
               className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
               style={{ gridAutoRows: "1fr" }}
             >
-              {trainingServices.map((service, index) => (
+              {category.services.map((service, index) => (
                 <ServiceCard
                   key={service.id}
-                  {...service}
+                  id={service.id}
+                  title={service.title}
+                  subtitle={service.subtitle}
+                  features={service.features}
+                  detailFromApi={service.detailFromApi}
                   index={index}
-                  totalCards={trainingServices.length}
+                  totalCards={category.services.length}
                   featured={service.id === featuredServiceId}
                 />
               ))}
             </motion.div>
           </div>
-        )}
-
-        {/* === Категория: Нутрициология === */}
-        {nutritionServices.length > 0 && (
-          <div className={trainingServices.length > 0 ? "" : "mb-20"}>
-            <div className="flex items-center gap-4 mb-10">
-              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-              <h3 className={`${DESIGN_TOKENS.heading.h3} text-primary px-4 whitespace-nowrap`}>
-                {t("services.category.nutrition")}
-              </h3>
-              <div className={DESIGN_TOKENS.divider + " flex-grow"} />
-            </div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
-              style={{ gridAutoRows: "1fr" }}
-            >
-              {nutritionServices.map((service, index) => (
-                <ServiceCard
-                  key={service.id}
-                  {...service}
-                  index={index}
-                  totalCards={nutritionServices.length}
-                />
-              ))}
-            </motion.div>
-          </div>
-        )}
+        ))}
       </div>
     </section>
   );

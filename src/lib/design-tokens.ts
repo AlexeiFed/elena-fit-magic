@@ -18,6 +18,9 @@ export const DESIGN_TOKENS = {
   navbar: "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
   navbarScrolled: "bg-background/80 backdrop-blur-xl shadow-sm border-b border-border/50",
 
+  /** Hero: отступ под fixed navbar (на lg раньше был pt-0 — контент впритык к меню) */
+  heroSectionPaddingTop: "pt-24 lg:pt-28 xl:pt-32",
+
   // --- Секции с чередованием фона ---
   section: {
     default: "py-24 px-6 md:px-12",

@@ -3,11 +3,12 @@
  * 3-колоночный layout: бренд + описание, быстрые ссылки, контакты.
  * Нижняя строка: копирайт + политика конфиденциальности.
  */
-import { Send } from "lucide-react";
+import { Send } from "@/components/icons";
 import maxLogoWebp from "@/assets/max-logo.webp";
 import maxLogoPng from "@/assets/max-logo.png";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
+import { useResolvedSiteContent } from "@/hooks/useResolvedSiteContent";
 import { DESIGN_TOKENS } from "@/lib/design-tokens";
 
 /** Якорные ссылки для быстрой навигации */
@@ -19,6 +20,7 @@ const QUICK_LINKS = [
 
 export const Footer = () => {
   const { t } = useI18n();
+  const { contacts } = useResolvedSiteContent();
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -65,7 +67,7 @@ export const Footer = () => {
             </h4>
             <div className="flex gap-4 justify-center md:justify-start">
               <a
-                href="https://t.me/Elena_fitmentor"
+                href={contacts.telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Telegram"
@@ -74,7 +76,7 @@ export const Footer = () => {
                 <Send className="w-6 h-6 text-primary" />
               </a>
               <a
-                href="https://max.ru/u/f9LHodD0cOJ_T7iKN2Kw7zp58r7mbJF6Sxnhw0mBrfPbUgYA5AfZYCRnxgE"
+                href={contacts.maxUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Max"

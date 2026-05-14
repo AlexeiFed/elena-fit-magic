@@ -6,14 +6,7 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Save,
-  Plus,
-  Trash2,
-  ChevronDown,
-  ChevronRight,
-  Check,
-  X,
-} from "lucide-react";
+  Save, Plus, Trash2, ChevronDown, ChevronRight, Check, X } from "@/components/icons";
 import { useSiteContent, QUERY_KEYS } from "@/hooks/useSiteData";
 import { saveSiteContent } from "@/lib/api";
 import type { SiteContentData } from "@/lib/api";
@@ -32,42 +25,59 @@ interface ProcessStep {
   description: string;
 }
 
+interface HeroBlock {
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+  cta: string;
+  stats: { clients: string; successRate: string };
+}
+
+interface AboutBlock {
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+  descriptions: string[];
+  regalia: string[];
+  features: AboutFeature[];
+}
+
+interface ProcessBlock {
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+  steps: ProcessStep[];
+}
+
+interface ServicesBlock {
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+}
+
+interface CtaBlock {
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+}
+
+interface ContactsBlock {
+  telegramUrl: string;
+  maxUrl: string;
+}
+
 interface LocalContentData {
-  hero: {
-    title: string;
-    titleHighlight: string;
-    subtitle: string;
-    cta: string;
-    stats: { clients: string; successRate: string };
-  };
-  about: {
-    title: string;
-    titleHighlight: string;
-    subtitle: string;
-    descriptions: string[];
-    regalia: string[];
-    features: AboutFeature[];
-  };
-  process: {
-    title: string;
-    titleHighlight: string;
-    subtitle: string;
-    steps: ProcessStep[];
-  };
-  services: {
-    title: string;
-    titleHighlight: string;
-    subtitle: string;
-  };
-  cta: {
-    title: string;
-    titleHighlight: string;
-    subtitle: string;
-  };
-  contacts: {
-    telegramUrl: string;
-    maxUrl: string;
-  };
+  hero: HeroBlock;
+  heroEn?: Partial<HeroBlock>;
+  about: AboutBlock;
+  aboutEn?: Partial<AboutBlock>;
+  process: ProcessBlock;
+  processEn?: Partial<ProcessBlock>;
+  services: ServicesBlock;
+  servicesEn?: Partial<ServicesBlock>;
+  cta: CtaBlock;
+  ctaEn?: Partial<CtaBlock>;
+  contacts: ContactsBlock;
 }
 
 /** Иконки доступные для About features */
@@ -135,6 +145,18 @@ export const ContentEditor = () => {
     setLocalData({
       ...localData,
       [section]: { ...localData[section], ...updates },
+    });
+  };
+
+  const mergeEn = (
+    enKey: "heroEn" | "aboutEn" | "processEn" | "servicesEn" | "ctaEn",
+    patch: Record<string, unknown>,
+  ) => {
+    if (!localData) return;
+    const prev = (localData[enKey] as Record<string, unknown> | undefined) ?? {};
+    setLocalData({
+      ...localData,
+      [enKey]: { ...prev, ...patch },
     });
   };
 
@@ -274,6 +296,54 @@ export const ContentEditor = () => {
             onChange={(v) => update("hero", { stats: { ...localData.hero.stats, successRate: v } })}
             placeholder="98%"
           />
+        </div>
+        <div className="pt-4 mt-2 border-t border-border/30 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">English (опционально, для переключателя EN на сайте)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Title"
+              value={localData.heroEn?.title ?? ""}
+              onChange={(v) => mergeEn("heroEn", { title: v })}
+            />
+            <Field
+              label="Title highlight"
+              value={localData.heroEn?.titleHighlight ?? ""}
+              onChange={(v) => mergeEn("heroEn", { titleHighlight: v })}
+            />
+          </div>
+          <Field
+            label="Subtitle"
+            value={localData.heroEn?.subtitle ?? ""}
+            onChange={(v) => mergeEn("heroEn", { subtitle: v })}
+            multiline
+          />
+          <Field
+            label="CTA button"
+            value={localData.heroEn?.cta ?? ""}
+            onChange={(v) => mergeEn("heroEn", { cta: v })}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Stats: clients"
+              value={localData.heroEn?.stats?.clients ?? ""}
+              onChange={(v) =>
+                mergeEn("heroEn", {
+                  stats: { ...(localData.heroEn?.stats ?? {}), clients: v },
+                })
+              }
+              placeholder="300+"
+            />
+            <Field
+              label="Stats: success"
+              value={localData.heroEn?.stats?.successRate ?? ""}
+              onChange={(v) =>
+                mergeEn("heroEn", {
+                  stats: { ...(localData.heroEn?.stats ?? {}), successRate: v },
+                })
+              }
+              placeholder="98%"
+            />
+          </div>
         </div>
       </Section>
 
@@ -441,6 +511,26 @@ export const ContentEditor = () => {
             ))}
           </div>
         </div>
+        <div className="pt-4 mt-2 border-t border-border/30 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">English — About (опционально)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Title"
+              value={localData.aboutEn?.title ?? ""}
+              onChange={(v) => mergeEn("aboutEn", { title: v })}
+            />
+            <Field
+              label="Title highlight"
+              value={localData.aboutEn?.titleHighlight ?? ""}
+              onChange={(v) => mergeEn("aboutEn", { titleHighlight: v })}
+            />
+          </div>
+          <Field
+            label="Subtitle"
+            value={localData.aboutEn?.subtitle ?? ""}
+            onChange={(v) => mergeEn("aboutEn", { subtitle: v })}
+          />
+        </div>
       </Section>
 
       {/* ===== Process ===== */}
@@ -519,6 +609,26 @@ export const ContentEditor = () => {
             ))}
           </div>
         </div>
+        <div className="pt-4 mt-2 border-t border-border/30 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">English — Process (опционально)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Title"
+              value={localData.processEn?.title ?? ""}
+              onChange={(v) => mergeEn("processEn", { title: v })}
+            />
+            <Field
+              label="Title highlight"
+              value={localData.processEn?.titleHighlight ?? ""}
+              onChange={(v) => mergeEn("processEn", { titleHighlight: v })}
+            />
+          </div>
+          <Field
+            label="Subtitle"
+            value={localData.processEn?.subtitle ?? ""}
+            onChange={(v) => mergeEn("processEn", { subtitle: v })}
+          />
+        </div>
       </Section>
 
       {/* ===== Services заголовки ===== */}
@@ -540,6 +650,26 @@ export const ContentEditor = () => {
           value={localData.services?.subtitle ?? ""}
           onChange={(v) => update("services", { subtitle: v })}
         />
+        <div className="pt-4 mt-2 border-t border-border/30 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">English — Services section (опционально)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Title"
+              value={localData.servicesEn?.title ?? ""}
+              onChange={(v) => mergeEn("servicesEn", { title: v })}
+            />
+            <Field
+              label="Title highlight"
+              value={localData.servicesEn?.titleHighlight ?? ""}
+              onChange={(v) => mergeEn("servicesEn", { titleHighlight: v })}
+            />
+          </div>
+          <Field
+            label="Subtitle"
+            value={localData.servicesEn?.subtitle ?? ""}
+            onChange={(v) => mergeEn("servicesEn", { subtitle: v })}
+          />
+        </div>
       </Section>
 
       {/* ===== CTA ===== */}
@@ -562,6 +692,27 @@ export const ContentEditor = () => {
           onChange={(v) => update("cta", { subtitle: v })}
           multiline
         />
+        <div className="pt-4 mt-2 border-t border-border/30 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">English — CTA (опционально)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field
+              label="Title"
+              value={localData.ctaEn?.title ?? ""}
+              onChange={(v) => mergeEn("ctaEn", { title: v })}
+            />
+            <Field
+              label="Title highlight"
+              value={localData.ctaEn?.titleHighlight ?? ""}
+              onChange={(v) => mergeEn("ctaEn", { titleHighlight: v })}
+            />
+          </div>
+          <Field
+            label="Subtitle"
+            value={localData.ctaEn?.subtitle ?? ""}
+            onChange={(v) => mergeEn("ctaEn", { subtitle: v })}
+            multiline
+          />
+        </div>
       </Section>
 
       {/* ===== Contacts ===== */}

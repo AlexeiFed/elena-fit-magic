@@ -7,19 +7,7 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Save,
-  Plus,
-  Trash2,
-  GripVertical,
-  ChevronDown,
-  ChevronRight,
-  Star,
-  Pencil,
-  X,
-  Check,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+  Save, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Star, Pencil, X, Check, Eye, EyeOff } from "@/components/icons";
 import { useServices, QUERY_KEYS } from "@/hooks/useSiteData";
 import { saveServices } from "@/lib/api";
 import type { ServicesData } from "@/lib/api";
@@ -49,9 +37,13 @@ interface ServiceDetails {
 interface ServiceItem {
   id: string;
   title: string;
+  titleEn?: string;
   subtitle: string;
+  subtitleEn?: string;
   features: string[];
+  featuresEn?: string[];
   details?: ServiceDetails;
+  detailsEn?: ServiceDetails;
   order: number;
   hidden?: boolean;
 }
@@ -59,6 +51,7 @@ interface ServiceItem {
 interface ServiceCategory {
   id: string;
   title: string;
+  titleEn?: string;
   services: ServiceItem[];
 }
 
@@ -67,8 +60,27 @@ interface LocalServicesData {
   categories: ServiceCategory[];
 }
 
+type DetailKey = "details" | "detailsEn";
+
 /** Генерация уникального ID */
 const generateId = () => `svc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+const confirmDelete = (message: string) => window.confirm(message);
+
+const createEmptyDetailsTranslation = (source?: ServiceDetails): ServiceDetails => ({
+  title: "",
+  subtitle: "",
+  description: "",
+  sections: (source?.sections ?? []).map((section) => ({
+    title: "",
+    items: section.items.map(() => ""),
+  })),
+  pricing: {
+    label: "",
+    options: (source?.pricing.options ?? []).map(() => ""),
+  },
+  extras: source?.extras?.map(() => "") ?? [],
+});
 
 export const ServicesEditor = () => {
   const queryClient = useQueryClient();
@@ -84,6 +96,7 @@ export const ServicesEditor = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [expandedDetails, setExpandedDetails] = useState<Set<string>>(new Set());
+  const [detailVariantByService, setDetailVariantByService] = useState<Record<string, DetailKey>>({});
 
   /* Синхронизация серверных данных — только реальные, не placeholder */
   useEffect(() => {
@@ -172,6 +185,10 @@ export const ServicesEditor = () => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     if (!cat) return;
+    const svc = cat.services.find((s) => s.id === svcId);
+    if (!svc) return;
+    const name = svc.title.trim() || "Без названия";
+    if (!confirmDelete(`Удалить услугу «${name}»? Изменение применится после нажатия «Сохранить».`)) return;
     updateCategory(catId, { services: cat.services.filter((s) => s.id !== svcId) });
   };
 
@@ -197,7 +214,11 @@ export const ServicesEditor = () => {
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
     if (!svc) return;
-    updateService(catId, svcId, { features: [...svc.features, ""] });
+    const nextEn = [...(svc.featuresEn ?? svc.features.map(() => ""))];
+    updateService(catId, svcId, {
+      features: [...svc.features, ""],
+      featuresEn: [...nextEn, ""],
+    });
   };
 
   /** Обновить фичу */
@@ -211,13 +232,31 @@ export const ServicesEditor = () => {
     updateService(catId, svcId, { features });
   };
 
+  const updateFeatureEn = (catId: string, svcId: string, featureIdx: number, value: string) => {
+    if (!localData) return;
+    const cat = localData.categories.find((c) => c.id === catId);
+    const svc = cat?.services.find((s) => s.id === svcId);
+    if (!svc) return;
+    const len = svc.features.length;
+    const arr = [...(svc.featuresEn ?? Array(len).fill(""))];
+    while (arr.length < len) arr.push("");
+    arr[featureIdx] = value;
+    updateService(catId, svcId, { featuresEn: arr });
+  };
+
   /** Удалить фичу */
   const removeFeature = (catId: string, svcId: string, featureIdx: number) => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
     if (!svc) return;
-    updateService(catId, svcId, { features: svc.features.filter((_, i) => i !== featureIdx) });
+    const nextFeatures = svc.features.filter((_, i) => i !== featureIdx);
+    const enBase = svc.featuresEn ?? svc.features.map(() => "");
+    const nextEn = enBase.filter((_, i) => i !== featureIdx);
+    updateService(catId, svcId, {
+      features: nextFeatures,
+      featuresEn: nextEn.length ? nextEn : undefined,
+    });
   };
 
   /** Установить featured */
@@ -247,6 +286,10 @@ export const ServicesEditor = () => {
   /** Удалить категорию */
   const removeCategory = (catId: string) => {
     if (!localData) return;
+    const cat = localData.categories.find((c) => c.id === catId);
+    if (!cat) return;
+    const name = cat.title.trim() || "Без названия";
+    if (!confirmDelete(`Удалить категорию «${name}» и все услуги внутри? Изменение применится после нажатия «Сохранить».`)) return;
     setLocalData({
       ...localData,
       categories: localData.categories.filter((c) => c.id !== catId),
@@ -271,143 +314,195 @@ export const ServicesEditor = () => {
     });
   };
 
-  /** Обновить поле details */
-  const updateDetails = (catId: string, svcId: string, updates: Partial<ServiceDetails>) => {
+  const pickDetail = (svc: ServiceItem | undefined, variant: DetailKey): ServiceDetails | undefined =>
+    !svc ? undefined : variant === "details" ? svc.details : svc.detailsEn;
+
+  /** Обновить поле details / detailsEn */
+  const updateDetails = (catId: string, svcId: string, updates: Partial<ServiceDetails>, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateService(catId, svcId, { details: { ...svc.details, ...updates } });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateService(catId, svcId, { [variant]: { ...cur, ...updates } } as Partial<ServiceItem>);
+  };
+
+  /** Инициализировать detailsEn пустой структурой под перевод, без RU-текста */
+  const ensureDetailsEn = (catId: string, svcId: string) => {
+    if (!localData) return;
+    const cat = localData.categories.find((c) => c.id === catId);
+    const svc = cat?.services.find((s) => s.id === svcId);
+    if (!svc || svc.detailsEn) return;
+    updateService(catId, svcId, { detailsEn: createEmptyDetailsTranslation(svc.details) });
   };
 
   /** Добавить секцию в details */
-  const addDetailSection = (catId: string, svcId: string) => {
+  const addDetailSection = (catId: string, svcId: string, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, {
-      sections: [...svc.details.sections, { title: "", items: [] }],
-    });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(catId, svcId, { sections: [...cur.sections, { title: "", items: [] }] }, variant);
   };
 
   /** Обновить секцию details */
-  const updateDetailSection = (catId: string, svcId: string, secIdx: number, updates: Partial<ServiceSection>) => {
+  const updateDetailSection = (
+    catId: string,
+    svcId: string,
+    secIdx: number,
+    updates: Partial<ServiceSection>,
+    variant: DetailKey = "details",
+  ) => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const sections = [...svc.details.sections];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const sections = [...cur.sections];
     sections[secIdx] = { ...sections[secIdx], ...updates };
-    updateDetails(catId, svcId, { sections });
+    updateDetails(catId, svcId, { sections }, variant);
   };
 
   /** Удалить секцию details */
-  const removeDetailSection = (catId: string, svcId: string, secIdx: number) => {
+  const removeDetailSection = (catId: string, svcId: string, secIdx: number, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, {
-      sections: svc.details.sections.filter((_, i) => i !== secIdx),
-    });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(catId, svcId, { sections: cur.sections.filter((_, i) => i !== secIdx) }, variant);
   };
 
   /** Добавить пункт в секцию details */
-  const addDetailSectionItem = (catId: string, svcId: string, secIdx: number) => {
+  const addDetailSectionItem = (catId: string, svcId: string, secIdx: number, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const sections = [...svc.details.sections];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const sections = [...cur.sections];
     sections[secIdx] = { ...sections[secIdx], items: [...sections[secIdx].items, ""] };
-    updateDetails(catId, svcId, { sections });
+    updateDetails(catId, svcId, { sections }, variant);
   };
 
   /** Обновить пункт секции details */
-  const updateDetailSectionItem = (catId: string, svcId: string, secIdx: number, itemIdx: number, value: string) => {
+  const updateDetailSectionItem = (
+    catId: string,
+    svcId: string,
+    secIdx: number,
+    itemIdx: number,
+    value: string,
+    variant: DetailKey = "details",
+  ) => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const sections = [...svc.details.sections];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const sections = [...cur.sections];
     const items = [...sections[secIdx].items];
     items[itemIdx] = value;
     sections[secIdx] = { ...sections[secIdx], items };
-    updateDetails(catId, svcId, { sections });
+    updateDetails(catId, svcId, { sections }, variant);
   };
 
   /** Удалить пункт секции details */
-  const removeDetailSectionItem = (catId: string, svcId: string, secIdx: number, itemIdx: number) => {
+  const removeDetailSectionItem = (
+    catId: string,
+    svcId: string,
+    secIdx: number,
+    itemIdx: number,
+    variant: DetailKey = "details",
+  ) => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const sections = [...svc.details.sections];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const sections = [...cur.sections];
     sections[secIdx] = { ...sections[secIdx], items: sections[secIdx].items.filter((_, i) => i !== itemIdx) };
-    updateDetails(catId, svcId, { sections });
+    updateDetails(catId, svcId, { sections }, variant);
   };
 
   /** Добавить вариант цены */
-  const addPricingOption = (catId: string, svcId: string) => {
+  const addPricingOption = (catId: string, svcId: string, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, {
-      pricing: { ...svc.details.pricing, options: [...svc.details.pricing.options, ""] },
-    });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(
+      catId,
+      svcId,
+      { pricing: { ...cur.pricing, options: [...cur.pricing.options, ""] } },
+      variant,
+    );
   };
 
   /** Обновить вариант цены */
-  const updatePricingOption = (catId: string, svcId: string, optIdx: number, value: string) => {
+  const updatePricingOption = (
+    catId: string,
+    svcId: string,
+    optIdx: number,
+    value: string,
+    variant: DetailKey = "details",
+  ) => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const options = [...svc.details.pricing.options];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const options = [...cur.pricing.options];
     options[optIdx] = value;
-    updateDetails(catId, svcId, { pricing: { ...svc.details.pricing, options } });
+    updateDetails(catId, svcId, { pricing: { ...cur.pricing, options } }, variant);
   };
 
   /** Удалить вариант цены */
-  const removePricingOption = (catId: string, svcId: string, optIdx: number) => {
+  const removePricingOption = (catId: string, svcId: string, optIdx: number, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, {
-      pricing: { ...svc.details.pricing, options: svc.details.pricing.options.filter((_, i) => i !== optIdx) },
-    });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(
+      catId,
+      svcId,
+      { pricing: { ...cur.pricing, options: cur.pricing.options.filter((_, i) => i !== optIdx) } },
+      variant,
+    );
   };
 
   /** Добавить доп. услугу */
-  const addExtra = (catId: string, svcId: string) => {
+  const addExtra = (catId: string, svcId: string, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, { extras: [...(svc.details.extras ?? []), ""] });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(catId, svcId, { extras: [...(cur.extras ?? []), ""] }, variant);
   };
 
   /** Обновить доп. услугу */
-  const updateExtra = (catId: string, svcId: string, extIdx: number, value: string) => {
+  const updateExtra = (catId: string, svcId: string, extIdx: number, value: string, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    const extras = [...(svc.details.extras ?? [])];
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    const extras = [...(cur.extras ?? [])];
     extras[extIdx] = value;
-    updateDetails(catId, svcId, { extras });
+    updateDetails(catId, svcId, { extras }, variant);
   };
 
   /** Удалить доп. услугу */
-  const removeExtra = (catId: string, svcId: string, extIdx: number) => {
+  const removeExtra = (catId: string, svcId: string, extIdx: number, variant: DetailKey = "details") => {
     if (!localData) return;
     const cat = localData.categories.find((c) => c.id === catId);
     const svc = cat?.services.find((s) => s.id === svcId);
-    if (!svc?.details) return;
-    updateDetails(catId, svcId, { extras: (svc.details.extras ?? []).filter((_, i) => i !== extIdx) });
+    const cur = pickDetail(svc, variant);
+    if (!cur) return;
+    updateDetails(catId, svcId, { extras: (cur.extras ?? []).filter((_, i) => i !== extIdx) }, variant);
   };
 
   /* ===== Toggle хелперы ===== */
@@ -510,7 +605,19 @@ export const ServicesEditor = () => {
           {/* Услуги категории */}
           {expandedCategories.has(cat.id) && (
             <div className="p-4 space-y-3">
-              {[...cat.services].sort((a, b) => a.order - b.order).map((svc, svcIdx) => (
+              <div className="pb-2 border-b border-border/20">
+                <label className="text-xs text-muted-foreground mb-1 block">Название категории (EN, опционально)</label>
+                <input
+                  type="text"
+                  value={cat.titleEn ?? ""}
+                  onChange={(e) => updateCategory(cat.id, { titleEn: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+                />
+              </div>
+              {[...cat.services].sort((a, b) => a.order - b.order).map((svc, svcIdx) => {
+                const detailVariant = detailVariantByService[svc.id] ?? "details";
+                const detailData = pickDetail(svc, detailVariant);
+                return (
                 <div
                   key={svc.id}
                   className={cn(
@@ -606,6 +713,27 @@ export const ServicesEditor = () => {
                         </div>
                       </div>
 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Название (EN)</label>
+                          <input
+                            type="text"
+                            value={svc.titleEn ?? ""}
+                            onChange={(e) => updateService(cat.id, svc.id, { titleEn: e.target.value })}
+                            className="w-full px-3 py-1.5 text-sm rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Подзаголовок (EN)</label>
+                          <input
+                            type="text"
+                            value={svc.subtitleEn ?? ""}
+                            onChange={(e) => updateService(cat.id, svc.id, { subtitleEn: e.target.value })}
+                            className="w-full px-3 py-1.5 text-sm rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+                          />
+                        </div>
+                      </div>
+
                       {/* Featured toggle */}
                       <div className="flex items-center gap-2">
                         <button
@@ -635,17 +763,25 @@ export const ServicesEditor = () => {
                         </div>
                         <div className="space-y-1.5">
                           {svc.features.map((feat, fIdx) => (
-                            <div key={fIdx} className="flex items-center gap-2">
+                            <div key={fIdx} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                               <input
                                 type="text"
                                 value={feat}
                                 onChange={(e) => updateFeature(cat.id, svc.id, fIdx, e.target.value)}
-                                placeholder="Текст фичи..."
+                                placeholder="RU…"
                                 className="flex-1 px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                               />
+                              <input
+                                type="text"
+                                value={(svc.featuresEn ?? [])[fIdx] ?? ""}
+                                onChange={(e) => updateFeatureEn(cat.id, svc.id, fIdx, e.target.value)}
+                                placeholder="EN…"
+                                className="flex-1 px-2.5 py-1 text-xs rounded-md border border-border/30 bg-muted/20 focus:outline-none focus:ring-1 focus:ring-primary/30"
+                              />
                               <button
+                                type="button"
                                 onClick={() => removeFeature(cat.id, svc.id, fIdx)}
-                                className="p-1 text-destructive/50 hover:text-destructive transition-colors"
+                                className="p-1 text-destructive/50 hover:text-destructive transition-colors shrink-0"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -674,16 +810,49 @@ export const ServicesEditor = () => {
                           </span>
                         </div>
 
-                        {expandedDetails.has(svc.id) && svc.details && (
+                        {expandedDetails.has(svc.id) && (
                           <div className="mt-3 ml-5 space-y-3">
+                            <div className="flex flex-wrap gap-2 pb-2 border-b border-border/20">
+                              <button
+                                type="button"
+                                className={cn(
+                                  "text-xs px-2 py-1 rounded-md border border-transparent",
+                                  detailVariant === "details" && "bg-primary/15 border-primary/30 text-primary",
+                                )}
+                                onClick={() => setDetailVariantByService((p) => ({ ...p, [svc.id]: "details" }))}
+                              >
+                                RU (модалка)
+                              </button>
+                              <button
+                                type="button"
+                                className={cn(
+                                  "text-xs px-2 py-1 rounded-md border border-transparent",
+                                  detailVariant === "detailsEn" && "bg-primary/15 border-primary/30 text-primary",
+                                )}
+                                onClick={() => {
+                                  ensureDetailsEn(cat.id, svc.id);
+                                  setDetailVariantByService((p) => ({ ...p, [svc.id]: "detailsEn" }));
+                                }}
+                              >
+                                EN (модалка)
+                              </button>
+                            </div>
+                            {!detailData ? (
+                              <p className="text-xs text-muted-foreground">
+                                {detailVariant === "detailsEn"
+                                  ? "Нет EN-текста. Нажмите «EN (модалка)» ещё раз после сохранения RU-деталей."
+                                  : "Сначала откройте блок и дождитесь инициализации RU."}
+                              </p>
+                            ) : (
+                              <div className="space-y-3">
                             {/* Заголовок и подзаголовок details */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                               <div>
                                 <label className="text-xs text-muted-foreground mb-1 block">Заголовок модалки</label>
                                 <input
                                   type="text"
-                                  value={svc.details.title}
-                                  onChange={(e) => updateDetails(cat.id, svc.id, { title: e.target.value })}
+                                  value={detailData.title}
+                                  onChange={(e) => updateDetails(cat.id, svc.id, { title: e.target.value }, detailVariant)}
                                   className="w-full px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                 />
                               </div>
@@ -691,8 +860,8 @@ export const ServicesEditor = () => {
                                 <label className="text-xs text-muted-foreground mb-1 block">Подзаголовок модалки</label>
                                 <input
                                   type="text"
-                                  value={svc.details.subtitle}
-                                  onChange={(e) => updateDetails(cat.id, svc.id, { subtitle: e.target.value })}
+                                  value={detailData.subtitle}
+                                  onChange={(e) => updateDetails(cat.id, svc.id, { subtitle: e.target.value }, detailVariant)}
                                   className="w-full px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                 />
                               </div>
@@ -702,8 +871,10 @@ export const ServicesEditor = () => {
                             <div>
                               <label className="text-xs text-muted-foreground mb-1 block">Описание (опционально)</label>
                               <textarea
-                                value={svc.details.description ?? ""}
-                                onChange={(e) => updateDetails(cat.id, svc.id, { description: e.target.value || undefined })}
+                                value={detailData.description ?? ""}
+                                onChange={(e) =>
+                                  updateDetails(cat.id, svc.id, { description: e.target.value || undefined }, detailVariant)
+                                }
                                 rows={2}
                                 className="w-full px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
                               />
@@ -714,25 +885,27 @@ export const ServicesEditor = () => {
                               <div className="flex items-center justify-between mb-2">
                                 <label className="text-xs text-muted-foreground font-medium">Секции</label>
                                 <button
-                                  onClick={() => addDetailSection(cat.id, svc.id)}
+                                  onClick={() => addDetailSection(cat.id, svc.id, detailVariant)}
                                   className="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
                                 >
                                   <Plus className="w-3 h-3" /> Добавить секцию
                                 </button>
                               </div>
                               <div className="space-y-3">
-                                {svc.details.sections.map((sec, secIdx) => (
+                                {detailData.sections.map((sec, secIdx) => (
                                   <div key={secIdx} className="rounded-md border border-border/30 bg-muted/20 p-2.5">
                                     <div className="flex items-center gap-2 mb-2">
                                       <input
                                         type="text"
                                         value={sec.title}
-                                        onChange={(e) => updateDetailSection(cat.id, svc.id, secIdx, { title: e.target.value })}
+                                        onChange={(e) =>
+                                          updateDetailSection(cat.id, svc.id, secIdx, { title: e.target.value }, detailVariant)
+                                        }
                                         placeholder="Название секции..."
                                         className="flex-1 px-2 py-1 text-xs font-medium rounded border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                       />
                                       <button
-                                        onClick={() => removeDetailSection(cat.id, svc.id, secIdx)}
+                                        onClick={() => removeDetailSection(cat.id, svc.id, secIdx, detailVariant)}
                                         className="p-1 text-destructive/50 hover:text-destructive"
                                       >
                                         <Trash2 className="w-3 h-3" />
@@ -746,11 +919,22 @@ export const ServicesEditor = () => {
                                           <input
                                             type="text"
                                             value={item}
-                                            onChange={(e) => updateDetailSectionItem(cat.id, svc.id, secIdx, itemIdx, e.target.value)}
+                                            onChange={(e) =>
+                                              updateDetailSectionItem(
+                                                cat.id,
+                                                svc.id,
+                                                secIdx,
+                                                itemIdx,
+                                                e.target.value,
+                                                detailVariant,
+                                              )
+                                            }
                                             className="flex-1 px-2 py-0.5 text-xs rounded border border-border/30 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                           />
                                           <button
-                                            onClick={() => removeDetailSectionItem(cat.id, svc.id, secIdx, itemIdx)}
+                                            onClick={() =>
+                                              removeDetailSectionItem(cat.id, svc.id, secIdx, itemIdx, detailVariant)
+                                            }
                                             className="p-0.5 text-destructive/40 hover:text-destructive"
                                           >
                                             <X className="w-2.5 h-2.5" />
@@ -758,7 +942,7 @@ export const ServicesEditor = () => {
                                         </div>
                                       ))}
                                       <button
-                                        onClick={() => addDetailSectionItem(cat.id, svc.id, secIdx)}
+                                        onClick={() => addDetailSectionItem(cat.id, svc.id, secIdx, detailVariant)}
                                         className="text-xs text-primary/60 hover:text-primary flex items-center gap-1 mt-1"
                                       >
                                         <Plus className="w-2.5 h-2.5" /> Пункт
@@ -774,24 +958,26 @@ export const ServicesEditor = () => {
                               <div className="flex items-center justify-between mb-2">
                                 <label className="text-xs text-muted-foreground font-medium">Цены</label>
                                 <button
-                                  onClick={() => addPricingOption(cat.id, svc.id)}
+                                  onClick={() => addPricingOption(cat.id, svc.id, detailVariant)}
                                   className="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
                                 >
                                   <Plus className="w-3 h-3" /> Вариант
                                 </button>
                               </div>
                               <div className="space-y-1.5">
-                                {svc.details.pricing.options.map((opt, optIdx) => (
+                                {detailData.pricing.options.map((opt, optIdx) => (
                                   <div key={optIdx} className="flex items-center gap-2">
                                     <input
                                       type="text"
                                       value={opt}
-                                      onChange={(e) => updatePricingOption(cat.id, svc.id, optIdx, e.target.value)}
+                                      onChange={(e) =>
+                                        updatePricingOption(cat.id, svc.id, optIdx, e.target.value, detailVariant)
+                                      }
                                       placeholder="Вариант цены..."
                                       className="flex-1 px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                     />
                                     <button
-                                      onClick={() => removePricingOption(cat.id, svc.id, optIdx)}
+                                      onClick={() => removePricingOption(cat.id, svc.id, optIdx, detailVariant)}
                                       className="p-1 text-destructive/50 hover:text-destructive"
                                     >
                                       <X className="w-3 h-3" />
@@ -806,24 +992,24 @@ export const ServicesEditor = () => {
                               <div className="flex items-center justify-between mb-2">
                                 <label className="text-xs text-muted-foreground font-medium">Доп. услуги</label>
                                 <button
-                                  onClick={() => addExtra(cat.id, svc.id)}
+                                  onClick={() => addExtra(cat.id, svc.id, detailVariant)}
                                   className="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
                                 >
                                   <Plus className="w-3 h-3" /> Добавить
                                 </button>
                               </div>
                               <div className="space-y-1.5">
-                                {(svc.details.extras ?? []).map((ext, extIdx) => (
+                                {(detailData.extras ?? []).map((ext, extIdx) => (
                                   <div key={extIdx} className="flex items-center gap-2">
                                     <input
                                       type="text"
                                       value={ext}
-                                      onChange={(e) => updateExtra(cat.id, svc.id, extIdx, e.target.value)}
+                                      onChange={(e) => updateExtra(cat.id, svc.id, extIdx, e.target.value, detailVariant)}
                                       placeholder="Доп. услуга..."
                                       className="flex-1 px-2.5 py-1 text-xs rounded-md border border-border/50 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                                     />
                                     <button
-                                      onClick={() => removeExtra(cat.id, svc.id, extIdx)}
+                                      onClick={() => removeExtra(cat.id, svc.id, extIdx, detailVariant)}
                                       className="p-1 text-destructive/50 hover:text-destructive"
                                     >
                                       <X className="w-3 h-3" />
@@ -832,13 +1018,15 @@ export const ServicesEditor = () => {
                                 ))}
                               </div>
                             </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
                     </div>
                   )}
                 </div>
-              ))}
+              );})}
 
               {/* Кнопка добавления услуги */}
               <button
